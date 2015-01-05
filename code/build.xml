@@ -1,0 +1,129 @@
+<project name="Generator">
+	<property name="output.path" location=""/>
+	<property name="generator" location="build/jar/AZClassGenerator.jar"/>
+
+		<target name="GetAutomaton">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-automaton"/>
+    	</java>
+    </target>
+
+	<target name="Generate">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-path"/>
+        	<arg value="${output.path}"/>
+        	<arg value="--diagram"/>
+        	<arg value="GameLoop.scxml"/>
+        	<arg value="--class-name"/>
+        	<arg value="Level"/>
+        	<arg value="--file-type"/>
+        	<arg value=".h"/>
+        	<arg value="--file-type"/>
+        	<arg value=".cpp"/>
+    	</java>
+    </target>
+    
+	<target name="GenerateOverwrite">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-path"/>
+        	<arg value="${output.path}"/>
+        	<arg value="--diagram"/>
+        	<arg value="GameLoop.scxml"/>
+        	<arg value="--class-name"/>
+        	<arg value="Level"/>
+        	<arg value="--force-overwrite"/>
+        	<arg value="--file-type"/>
+        	<arg value=".h"/>
+        	<arg value="--file-type"/>
+        	<arg value=".cpp"/>
+    	</java>
+    </target>
+
+	<target name="NotDerived">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-path"/>
+        	<arg value="${output.path}"/>
+        	<arg value="--diagram"/>
+        	<arg value="GameLoop.scxml"/>
+        	<arg value="--class-name"/>
+        	<arg value="Level"/>
+        	<arg value="--not-derived"/>
+        	<arg value="--file-type"/>
+        	<arg value=".h"/>
+        	<arg value="--file-type"/>
+        	<arg value=".cpp"/>
+    	</java>
+    </target>
+    
+	<target name="Virtual">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-path"/>
+        	<arg value="${output.path}"/>
+        	<arg value="--diagram"/>
+        	<arg value="GameLoop.scxml"/>
+        	<arg value="--class-name"/>
+        	<arg value="Level"/>
+        	<arg value="--make-virtual"/>
+        	<arg value="--file-type"/>
+        	<arg value=".h"/>
+        	<arg value="--file-type"/>
+        	<arg value=".cpp"/>
+    	</java>
+    </target>
+    
+	<target name="CustomTemplate.h">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-path"/>
+        	<arg value="${output.path}"/>
+        	<arg value="--diagram"/>
+        	<arg value="GameLoop.scxml"/>
+        	<arg value="--class-name"/>
+        	<arg value="Level"/>
+        	<arg value="--file-type"/>
+        	<arg value=".h"/>
+        	<arg value="--template"/>
+        	<arg value="h.derived.template"/>
+    	</java>
+    </target>
+    
+	<target name="CustomTemplate.cpp">
+        <java jar="${generator}" fork="true">
+        	<arg value="--output-path"/>
+        	<arg value="${output.path}"/>
+        	<arg value="--diagram"/>
+        	<arg value="GameLoop.scxml"/>
+        	<arg value="--class-name"/>
+        	<arg value="Level"/>
+        	<arg value="--file-type"/>
+        	<arg value=".cpp"/>
+        	<arg value="--template"/>
+        	<arg value="cpp.derived.template"/>
+    	</java>
+    </target>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes"/>
+        <copy file="templates/cpp.template" todir="build/classes/az"/>
+        <copy file="templates/h.template" todir="build/classes/az"/>
+        <copy file="templates/cpp.derived.template" todir="build/classes/az"/>
+        <copy file="templates/h.derived.template" todir="build/classes/az"/>
+        <copy file="FSMs/AZ.h" todir="build/classes/az"/>
+        <copy file="FSMs/AZ.cpp" todir="build/classes/az"/>
+        <copy file="FSMs/Automaton.h" todir="build/classes/az"/>
+        <copy file="FSMs/Automaton.cpp" todir="build/classes/az"/>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/AZClassGenerator.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="az.CodeGenerator"/>
+            </manifest>
+        </jar>
+    </target>
+</project>

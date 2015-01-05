@@ -1,0 +1,31 @@
+#include "${CLASS_NAME}.h"
+#include "AZ.h"
+
+// States
+${STATE_METHODS_DEFINITIONS}
+
+// Initialization of state machine will be called 
+// by the Automaton constructor.
+void ${CLASS_NAME}::AZInit()
+{
+  // Populate hashtable
+  // ${TABLE_INSERTIONS_START}
+  // ${TABLE_INSERTIONS_END}
+  
+  // Create a method index
+  // ${STATE_METHOD_POINTERS_START}
+  // ${STATE_METHOD_POINTERS_END}
+  mi[0] = 0;
+
+  // Set initial state
+  // ${INITIAL_STATE_START}
+  // ${INITIAL_STATE_END}
+}
+
+${CLASS_NAME}::${CLASS_NAME}() : Automaton()
+{
+}
+
+${CLASS_NAME}::~${CLASS_NAME}()
+{
+}

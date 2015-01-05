@@ -1,0 +1,85 @@
+Tool for converting an scxml-based state diagram into code.
+
+
+Usage examples
+==============
+
+java -jar AZClassGenerator.jar --diagram example/scxml/example.scxml --class-name Example --file-type .h --file-type .cpp
+
+Reads example.scxml and generates Example.cpp and Example.h
+
+
+java -jar AZClassGenerator.jar --output-automaton
+
+Creates AZ.h, AZ.cpp, Automaton.h and Automaton.cpp. These are the class
+definitions of the FSM needed to compile code generated from a diagram.
+
+
+Command line args
+=================
+
+--diagram diagram_name
+
+  Used to specify the diagram for which to generate the FSM.
+
+
+--template template_name
+
+  Used to specify a alternate non-default template from which to
+  generate the FSM.
+
+
+--class-name class_name
+
+  Used to specify the name of the class of the generated FSM. A class
+  name must always be specified.
+
+
+--class-name-prefix class_name_prefix
+
+  Used to specify a prefix to the class name. By default all generated
+  files with be prefixed with AZ. To specify an alternate string, use 
+  this flag. To specify no prefix use: --no-prefix
+
+
+--no-prefix
+
+  Used to specify that generated classes should no contain the default
+  AZ prefix.
+
+
+--force-overwrite
+
+  Use to specify that an existing class may be overwritten. By default
+  generated class files will not overwrite existing code.
+
+
+--not-derived
+
+  Used to specify that the generated FSM should not be derived
+  (inherited from the Automaton based class but instead has the 
+  automaton code as part of the generated code). By default, 
+  generated class files are derived from the automaton base
+  class to make them tidier (essentially just contains the
+  state methods).
+
+
+--make-virtual
+
+  Used to specify that generated state method should be declared as
+  virtual. This should be used if you intend to extend the generated
+  code. By default the methods are not virtual. This flag is only valid
+  for the .h file type.
+
+
+--file-type file_type
+
+  Used to specify the type of file to create. Currently supported types
+  are .h and .cpp. Multiple file types can be specified in one call eg,
+  --file-type .h --file-type .cpp
+
+
+--output-automaton
+
+  Writes out AZ.h, AZ.cpp, Automaton.h and Automaton.cpp  the default
+  implementation of the FSM.  These files are needed to compile generated code. 

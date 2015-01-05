@@ -1,0 +1,50 @@
+#include "${CLASS_NAME}.h"
+#include "AZ.h"
+
+#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
+
+// States
+${STATE_METHODS_DEFINITIONS}
+
+// Initialization of state machine
+void ${CLASS_NAME}::AZInit()
+{
+  // Populate hashtable
+  // ${TABLE_INSERTIONS_START}
+  // ${TABLE_INSERTIONS_END}
+  
+  // Create a method index
+  // ${STATE_METHOD_POINTERS_START}
+  // ${STATE_METHOD_POINTERS_END}
+  mi[0] = 0;
+
+  // Set initial state
+  // ${INITIAL_STATE_START}
+  // ${INITIAL_STATE_END}
+}
+
+${CLASS_NAME}::${CLASS_NAME}()
+{
+  stateMachine = new AZStateMachine();
+  AZInit();
+}
+
+${CLASS_NAME}::~${CLASS_NAME}()
+{
+  delete stateMachine;
+}
+
+void ${CLASS_NAME}::AZExecuteCurrentState()
+{
+  while(CALL_MEMBER_FN(*this, mi[m_CurrentState]) ())
+    ;
+}
+
+void ${CLASS_NAME}::AZProcessInput(int input)
+{
+  int newState = stateMachine->GetNextState(0, m_CurrentState, input);
+  if(newState >= 0)
+  {
+    m_CurrentState = newState;
+  }
+}
