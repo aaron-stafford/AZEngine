@@ -27,7 +27,7 @@ public:
   
   // Init
   ${CLASS_NAME}();
-  ~${CLASS_NAME}();
+  virtual ~${CLASS_NAME}();
   void AZExecuteCurrentState();
   void AZProcessInput(int input);
 private:
