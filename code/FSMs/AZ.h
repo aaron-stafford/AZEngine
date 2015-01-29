@@ -63,7 +63,7 @@ private:
   int m_NumEntriesInTable;
   int m_RehashThreshold;
   float m_LoadFactor;
-  int m_ModCount = 0;
+  int m_ModCount;
   
   void Init(int initialCapacity, float loadFactor);
 };

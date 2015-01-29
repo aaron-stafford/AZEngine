@@ -96,6 +96,7 @@ AZHashtable::~AZHashtable()
 
 void AZHashtable::Init(int initialCapacity, float loadFactor)
 {
+  m_ModCount = 0;
   m_LoadFactor = loadFactor;
   m_TableLength = initialCapacity;
   

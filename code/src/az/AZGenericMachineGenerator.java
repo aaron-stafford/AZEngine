@@ -377,7 +377,7 @@ public class AZGenericMachineGenerator
                         output.append(s + "\n");
                         for (String stateName : orderedSet)
                         {
-                            output.append("  const int " + stateName + " = "
+                            output.append("  static const int " + stateName + " = "
                                     + stateIndex.get(stateName) + ";\n");
                         }
 
@@ -407,7 +407,7 @@ public class AZGenericMachineGenerator
                         output.append(s + "\n");
                         for (String eventName : orderedEventSet)
                         {
-                            output.append("  const int " + eventName + " = "
+                            output.append("  static const int " + eventName + " = "
                                     + eventIndex.get(eventName) + ";\n");
                         }
 
