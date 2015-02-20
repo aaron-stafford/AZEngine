@@ -6,6 +6,9 @@
 // States
 ${STATE_METHODS_DEFINITIONS}
 
+// Transition methods
+${TRANSITION_METHODS_DEFINITIONS}
+
 // Initialization of state machine
 void ${CLASS_NAME}::AZInit()
 {
@@ -13,14 +16,17 @@ void ${CLASS_NAME}::AZInit()
   // ${TABLE_INSERTIONS_START}
   // ${TABLE_INSERTIONS_END}
   
-  // Create a method index
-  // ${STATE_METHOD_POINTERS_START}
-  // ${STATE_METHOD_POINTERS_END}
-  mi[0] = 0;
-
   // Set initial state
   // ${INITIAL_STATE_START}
   // ${INITIAL_STATE_END}
+
+  // Populate debug input index
+  // ${POPULATE_DEBUG_INPUT_INDEX_START}
+  // ${POPULATE_DEBUG_INPUT_INDEX_END}
+
+  // Populate debug state index
+  // ${POPULATE_DEBUG_STATE_INDEX_START}
+  // ${POPULATE_DEBUG_STATE_INDEX_END}
 }
 
 ${CLASS_NAME}::${CLASS_NAME}()
@@ -36,15 +42,19 @@ ${CLASS_NAME}::~${CLASS_NAME}()
 
 void ${CLASS_NAME}::AZExecuteCurrentState()
 {
-  while(CALL_MEMBER_FN(*this, mi[m_CurrentState]) ())
+  while(CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ())
     ;
 }
 
 void ${CLASS_NAME}::AZProcessInput(int input)
 {
-  int newState = stateMachine->GetNextState(0, m_CurrentState, input);
-  if(newState >= 0)
-  {
-    m_CurrentState = newState;
+  transition_info_t newState = stateMachine.GetNextState(0, m_CurrentState, a_Input);
+
+  if(newState.stateIndex >= 0)
+  { 
+    m_PreviousState = m_CurrentState;
+    m_CurrentState = newState.stateIndex;
+    m_PreviousInfo = m_CurrentInfo;
+    m_CurrentInfo = newState;
   }
 }

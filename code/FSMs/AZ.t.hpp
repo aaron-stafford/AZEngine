@@ -37,10 +37,16 @@ void AZStateMachine<T>::InsertTransition(int objectID, int currentState, int inp
   
   T existingState = hashtable->Put(key, newState);
   
-  if(existingState >= 0)
-  {
-    // transition already exists. Should check for this in debug, not so interested in release.
-  }
+//  if(existingState >= 0)
+//  {
+//    // transition already exists. Should check for this in debug, not so interested in release.
+//  }
+}
+
+template <class T>
+void AZStateMachine<T>::SetErrorValue(T value)
+{
+  hashtable->SetErrorValue(value);
 }
 
 template <class T>
@@ -172,7 +178,14 @@ T AZHashtable<T>::Get(int key)
       return e->m_Value;
     }
   }
-  return -1;
+
+  return m_ErrorValue;
+}
+
+template <class T>
+void AZHashtable<T>::SetErrorValue(T value)
+{
+  m_ErrorValue = value;
 }
 
 template <class T>
@@ -206,7 +219,7 @@ T AZHashtable<T>::Put(int key, T value)
   Entry<T>* e = tab[index];
   tab[index] = new Entry<T>(hash, key, value, e);
   m_NumEntriesInTable++;
-  return 0;
+  return value;
 }
 
 

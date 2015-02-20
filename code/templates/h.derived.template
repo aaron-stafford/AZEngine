@@ -3,6 +3,7 @@
 //
 
 #include "Automaton.h"
+#include <string>
 
 #ifndef __${CLASS_NAME}__
 #define __${CLASS_NAME}__
@@ -22,11 +23,27 @@ public:
   // ${STATE_METHODS_DECLARATIONS_START}
   // ${STATE_METHODS_DECLARATIONS_END}
 
+  // Transitions methods 
+  // ${TRANSITION_METHODS_DECLARATIONS_START}
+  // ${TRANSITION_METHODS_DECLARATIONS_END} 
+
+  // Debug accessor entries 
+  // ${DEBUG_ACCESSORS_START}
+  // ${DEBUG_ACCESSORS_END}
+
   // Init
   ${CLASS_NAME}();
   virtual ~${CLASS_NAME}();
 
   virtual void AZInit();
+private:
+  // Debug input index entries 
+  // ${DEBUG_INPUT_INDEXES_START}
+  // ${DEBUG_INPUT_INDEXES_END}
+
+  // Debug state index entries 
+  // ${DEBUG_STATE_INDEXES_START}
+  // ${DEBUG_STATE_INDEXES_END}
 };
 
 #endif

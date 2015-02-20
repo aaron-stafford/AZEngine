@@ -5,6 +5,8 @@
 #ifndef __${CLASS_NAME}__
 #define __${CLASS_NAME}__
 
+#include <string>
+
 class AZStateMachine;
 
 class ${CLASS_NAME}
@@ -22,6 +24,14 @@ public:
   // ${STATE_METHODS_DECLARATIONS_START}
   // ${STATE_METHODS_DECLARATIONS_END}
   
+  // Transitions methods 
+  // ${TRANSITION_METHODS_DECLARATIONS_START}
+  // ${TRANSITION_METHODS_DECLARATIONS_END} 
+
+  // Debug accessor entries 
+  // ${DEBUG_ACCESSORS_START}
+  // ${DEBUG_ACCESSORS_END}
+
   // Member variables
   int m_CurrentState;
   
@@ -35,6 +45,14 @@ private:
   void AZInit();
   typedef bool(${CLASS_NAME}::*MethodIndex)();
   MethodIndex* mi;
+
+  // Debug input index entries 
+  // ${DEBUG_INPUT_INDEXES_START}
+  // ${DEBUG_INPUT_INDEXES_END}
+
+  // Debug state index entries 
+  // ${DEBUG_STATE_INDEXES_START}
+  // ${DEBUG_STATE_INDEXES_END}
 };
 
 #endif

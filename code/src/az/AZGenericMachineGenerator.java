@@ -21,14 +21,29 @@ import org.w3c.dom.NodeList;
 
 public class AZGenericMachineGenerator
 {
+    private class Transition
+    {
+        String startStateId;
+        String eventId;
+        String endStateId;
+
+        public Transition(String startStateId, String eventId, String endStateId)
+        {
+            this.startStateId = startStateId;
+            this.eventId = eventId;
+            this.endStateId = endStateId;
+        }
+    }
+
     static Hashtable<String, Integer> stateIndex = new Hashtable<String, Integer>();
     static Hashtable<String, Integer> eventIndex = new Hashtable<String, Integer>();
     static Hashtable<String, String> codeBlocks = new Hashtable<String, String>();
+    static ArrayList<Transition> transitions = new ArrayList<Transition>();
 
     static String inputFile = null;
     static String CLASS_NAME = null;
     static String STATE_METHOD_PREFIX = "AZ_";
-    static ArrayList<String> transitions = new ArrayList<String>();
+    static ArrayList<String> codeTransitions = new ArrayList<String>();
     static String initialState = null;
 
     /**
@@ -270,8 +285,10 @@ public class AZGenericMachineGenerator
                                     String target = transitionElement
                                             .getAttribute("target");
 
-                                    transitions
-                                            .add("stateMachine->InsertTransition(0, "
+                                    transitions.add(new Transition(stateID, eventID, target));
+
+                                    codeTransitions
+                                            .add("stateMachine.InsertTransition(0, "
                                                     + stateID
                                                     + ", "
                                                     + eventID
@@ -428,6 +445,57 @@ public class AZGenericMachineGenerator
                             }
                         }
                     }
+                    else if (key.equals("TRANSITION_METHODS_DECLARATIONS_START"))
+                    {
+                        output.append(s + "\n");
+                        for (Transition transition : transitions)
+                        {
+                            if (makeVirtual)
+                            {
+                                output.append("  virtual bool "
+                                        + STATE_METHOD_PREFIX 
+                                        + transition.startStateId + "_ON_" 
+                                        + transition.eventId + "();\n");
+                            }
+                            else
+                            {
+                                output.append("  bool "
+                                        + STATE_METHOD_PREFIX 
+                                        + transition.startStateId + "_ON_" 
+                                        + transition.eventId + "();\n");
+                            }
+                        }
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("TRANSITION_METHODS_DECLARATIONS_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("TRANSITION_METHODS_DEFINITIONS"))
+                    {
+                        for (Transition transition : transitions)
+                        {
+                            output.append("bool " + CLASS_NAME + "::"
+                                   + STATE_METHOD_PREFIX 
+                                   + transition.startStateId + "_ON_" 
+                                   + transition.eventId + "()\n");
+                            output.append("{\n");
+                            output.append("  return false;\n");
+                            output.append("}\n\n");
+                        }
+                    }
                     else if (key.equals("STATE_METHODS_DECLARATIONS_START"))
                     {
                         Set<String> stateNames = stateIndex.keySet();
@@ -493,9 +561,25 @@ public class AZGenericMachineGenerator
                     else if (key.equals("TABLE_INSERTIONS_START"))
                     {
                         output.append(s + "\n");
-                        for (String transition : transitions)
+
+                        output.append("  transition_info_t info;\n");
+                        for (Transition transition : transitions)
                         {
-                            output.append("  " + transition + "\n");
+                            output.append("  info.transitionMethod = (MethodIndex)&" + CLASS_NAME + "::"
+                                   + STATE_METHOD_PREFIX 
+                                   + transition.startStateId + "_ON_" 
+                                   + transition.eventId + ";\n");
+
+                            output.append("  info.stateMethod = (MethodIndex)&" + CLASS_NAME + "::"
+                                   + STATE_METHOD_PREFIX 
+                                   + transition.endStateId + ";\n");
+
+                            output.append("  info.stateIndex = "
+                                   + transition.endStateId + ";\n");
+
+                            output.append("  stateMachine.InsertTransition(0, "
+                                   + transition.startStateId + ", "
+                                   + transition.eventId + ", info);\n\n");
                         }
 
                         while (templateReader.ready())
@@ -553,6 +637,18 @@ public class AZGenericMachineGenerator
                         output.append(s + "\n");
                         output.append("  m_CurrentState = " + initialState
                                 + ";\n");
+                        output.append("  m_PreviousState = " + initialState
+                                + ";\n\n");
+
+                        output.append("  info.transitionMethod = 0;\n");
+                        output.append("  info.stateMethod = (MethodIndex)&" + CLASS_NAME + "::"
+                               + STATE_METHOD_PREFIX 
+                               + initialState + ";\n");
+
+                        output.append("  info.stateIndex = " + initialState + ";\n");
+
+                        output.append("  m_CurrentInfo = info;\n");
+                        output.append("  m_PreviousInfo = info;\n");
 
                         while (templateReader.ready())
                         {
@@ -564,6 +660,147 @@ public class AZGenericMachineGenerator
                                 String newKey = matches.group(2);
 
                                 if (newKey.equals("INITIAL_STATE_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("POPULATE_DEBUG_INPUT_INDEX_START"))
+                    {
+                        Set<String> eventNames = eventIndex.keySet();
+                        TreeSet<String> orderedEventSet = new TreeSet<String>(
+                                eventNames);
+
+                        output.append(s + "\n");
+
+                        for (String eventName : orderedEventSet)
+                        {
+                            output.append("  m_DebugInputIndex[" + eventName + "] = \"" + eventName + "\";\n");
+                        }
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("POPULATE_DEBUG_INPUT_INDEX_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("DEBUG_ACCESSORS_START"))
+                    {
+                        output.append(s + "\n");
+                        output.append("  inline std::string GetStateAsText(int StateIndex)\n");
+                        output.append("  {\n");
+                        output.append("      return m_DebugStateIndex[StateIndex];\n");
+                        output.append("  }\n");
+                        output.append("  \n");
+
+                        output.append("  inline std::string GetInputAsText(int InputIndex)\n");
+                        output.append("  {\n");
+                        output.append("      return m_DebugInputIndex[InputIndex];\n");
+                        output.append("  }\n");
+                        output.append("  \n");
+
+                        output.append("  inline std::string GetTemplateName()\n");
+                        output.append("  {\n");
+                        output.append("      return std::string(\"" + inputFile + "\");\n");
+                        output.append("  }\n");
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("DEBUG_ACCESSORS_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    else if (key.equals("POPULATE_DEBUG_STATE_INDEX_START"))
+                    {
+                        Set<String> stateNames = stateIndex.keySet();
+                        output.append(s + "\n");
+
+                        for (String stateName : stateNames)
+                        {
+                            output.append("  m_DebugStateIndex[" + stateName + "] = \"" + stateName + "\";\n");
+                        }
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("POPULATE_DEBUG_STATE_INDEX_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("DEBUG_INPUT_INDEXES_START"))
+                    {
+                        Set<String> eventNames = eventIndex.keySet();
+                        output.append(s + "\n");
+                        output.append("  std::string m_DebugInputIndex[" + eventNames.size() + "];\n");
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("DEBUG_INPUT_INDEXES_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("DEBUG_STATE_INDEXES_START"))
+                    {
+                        Set<String> stateNames = stateIndex.keySet();
+                        output.append(s + "\n");
+                        output.append("  std::string m_DebugStateIndex[" + (stateNames.size() + 1) + "];\n");
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("DEBUG_STATE_INDEXES_END"))
                                 {
                                     output.append(tempString);
                                     break;

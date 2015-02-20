@@ -114,6 +114,7 @@
         <copy file="templates/h.derived.template" todir="build/classes/az"/>
         <copy file="FSMs/AZ.h" todir="build/classes/az"/>
         <copy file="FSMs/AZ.cpp" todir="build/classes/az"/>
+        <copy file="FSMs/AZ.t.hpp" todir="build/classes/az"/>
         <copy file="FSMs/Automaton.h" todir="build/classes/az"/>
         <copy file="FSMs/Automaton.cpp" todir="build/classes/az"/>
     </target>

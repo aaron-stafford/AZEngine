@@ -397,6 +397,9 @@ public class CodeGenerator extends AZGenericMachineGenerator
             String azH = getPackageFileAsString("AZ.h");
             writeToFile(azH, "AZ.h");
 
+            String azHPP = getPackageFileAsString("AZ.t.hpp");
+            writeToFile(azHPP, "AZ.t.hpp");
+
             if (derived)
             {
                 String automatonCPP = getPackageFileAsString("Automaton.cpp");

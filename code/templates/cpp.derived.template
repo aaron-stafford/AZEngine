@@ -4,6 +4,9 @@
 // States
 ${STATE_METHODS_DEFINITIONS}
 
+// Transition methods
+${TRANSITION_METHODS_DEFINITIONS}
+
 // Initialization of state machine will be called 
 // by the Automaton constructor.
 void ${CLASS_NAME}::AZInit()
@@ -12,14 +15,17 @@ void ${CLASS_NAME}::AZInit()
   // ${TABLE_INSERTIONS_START}
   // ${TABLE_INSERTIONS_END}
   
-  // Create a method index
-  // ${STATE_METHOD_POINTERS_START}
-  // ${STATE_METHOD_POINTERS_END}
-  mi[0] = 0;
-
   // Set initial state
   // ${INITIAL_STATE_START}
   // ${INITIAL_STATE_END}
+
+  // Populate debug input index
+  // ${POPULATE_DEBUG_INPUT_INDEX_START}
+  // ${POPULATE_DEBUG_INPUT_INDEX_END}
+
+  // Populate debug state index
+  // ${POPULATE_DEBUG_STATE_INDEX_START}
+  // ${POPULATE_DEBUG_STATE_INDEX_END}
 }
 
 ${CLASS_NAME}::${CLASS_NAME}() : Automaton()
