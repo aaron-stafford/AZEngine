@@ -1,6 +1,10 @@
 #include "Automaton.h"
 #include "AZ.h"
 
+#ifdef STATE_DEBUGGING
+#include <iostream>
+#endif
+
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 Automaton::Automaton()
@@ -22,6 +26,10 @@ void Automaton::AZExecuteCurrentState()
 {
   PreExecuteCurrentState();
 
+#ifdef STATE_DEBUGGING
+  std::cout << GetStateAsText(m_CurrentInfo.stateIndex) << std::endl;
+#endif
+
   while(CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ())
     ;
 
@@ -30,15 +38,19 @@ void Automaton::AZExecuteCurrentState()
 
 void Automaton::AZProcessInput(int a_Input)
 {
-  transition_info_t newState = stateMachine.GetNextState(0, m_CurrentState, a_Input);
+  transition_info_t newState = stateMachine.GetNextState(0, m_CurrentInfo.stateIndex, a_Input);
 
   if(newState.stateIndex >= 0)
   { 
-    m_PreviousState = m_CurrentState;
-    m_CurrentState = newState.stateIndex;
+#ifdef STATE_DEBUGGING
     m_PreviousInfo = m_CurrentInfo;
+#endif
     m_CurrentInfo = newState;
   }
+
+#ifdef STATE_DEBUGGING
+  std::cout << GetInputAsText(a_Input) << std::endl;
+#endif
 
   // Call the transition method
   CALL_MEMBER_FN(*this, m_CurrentInfo.transitionMethod) ();
@@ -81,5 +93,3 @@ void Automaton::SetParent(Automaton* a_Parent)
 {
   m_Parent = a_Parent;
 }
-
-

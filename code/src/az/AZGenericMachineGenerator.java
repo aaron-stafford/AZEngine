@@ -635,11 +635,6 @@ public class AZGenericMachineGenerator
                     else if (key.equals("INITIAL_STATE_START"))
                     {
                         output.append(s + "\n");
-                        output.append("  m_CurrentState = " + initialState
-                                + ";\n");
-                        output.append("  m_PreviousState = " + initialState
-                                + ";\n\n");
-
                         output.append("  info.transitionMethod = 0;\n");
                         output.append("  info.stateMethod = (MethodIndex)&" + CLASS_NAME + "::"
                                + STATE_METHOD_PREFIX 
