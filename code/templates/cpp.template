@@ -20,6 +20,7 @@ void ${CLASS_NAME}::AZInit()
   // ${INITIAL_STATE_START}
   // ${INITIAL_STATE_END}
 
+#ifdef STATE_DEBUGGING
   // Populate debug input index
   // ${POPULATE_DEBUG_INPUT_INDEX_START}
   // ${POPULATE_DEBUG_INPUT_INDEX_END}
@@ -27,6 +28,7 @@ void ${CLASS_NAME}::AZInit()
   // Populate debug state index
   // ${POPULATE_DEBUG_STATE_INDEX_START}
   // ${POPULATE_DEBUG_STATE_INDEX_END}
+#endif
 }
 
 ${CLASS_NAME}::${CLASS_NAME}()
@@ -52,9 +54,9 @@ void ${CLASS_NAME}::AZProcessInput(int input)
 
   if(newState.stateIndex >= 0)
   { 
-    m_PreviousState = m_CurrentState;
-    m_CurrentState = newState.stateIndex;
+#ifdef STATE_DEBUGGING
     m_PreviousInfo = m_CurrentInfo;
+#endif
     m_CurrentInfo = newState;
   }
 }

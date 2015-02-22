@@ -27,9 +27,11 @@ public:
   // ${TRANSITION_METHODS_DECLARATIONS_START}
   // ${TRANSITION_METHODS_DECLARATIONS_END} 
 
+#ifdef STATE_DEBUGGING
   // Debug accessor entries 
   // ${DEBUG_ACCESSORS_START}
   // ${DEBUG_ACCESSORS_END}
+#endif
 
   // Init
   ${CLASS_NAME}();
@@ -37,6 +39,7 @@ public:
 
   virtual void AZInit();
 private:
+#ifdef STATE_DEBUGGING
   // Debug input index entries 
   // ${DEBUG_INPUT_INDEXES_START}
   // ${DEBUG_INPUT_INDEXES_END}
@@ -44,6 +47,7 @@ private:
   // Debug state index entries 
   // ${DEBUG_STATE_INDEXES_START}
   // ${DEBUG_STATE_INDEXES_END}
+#endif
 };
 
 #endif
