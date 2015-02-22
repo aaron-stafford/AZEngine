@@ -20,7 +20,7 @@ public:
   virtual void AZInit();
   virtual void PreExecuteCurrentState();
   virtual void PostExecuteCurrentState();
-  void AddChild(Automaton* a_Child, bool a_IsPreExecute, bool a_IsPostExecute, bool a_IsProcessInput);
+  void AddChild(Automaton* a_Child, bool a_IsPreExecute, bool a_IsPostExecute);
   void SetParent(Automaton* a_Parent);
 #ifdef STATE_DEBUGGING
   virtual std::string GetStateAsText(int StateIndex) = 0;

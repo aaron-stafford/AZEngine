@@ -76,7 +76,7 @@ void Automaton::PostExecuteCurrentState()
     }
 }
 
-void Automaton::AddChild(Automaton* a_Child, bool a_IsPreExecute, bool a_IsPostExecute, bool a_IsProcessInput)
+void Automaton::AddChild(Automaton* a_Child, bool a_IsPreExecute, bool a_IsPostExecute)
 {
   if(a_IsPreExecute)
   {
