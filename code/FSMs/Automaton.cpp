@@ -30,8 +30,7 @@ void Automaton::AZExecuteCurrentState()
   std::cout << GetStateAsText(m_CurrentInfo.stateIndex) << std::endl;
 #endif
 
-  while(CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ())
-    ;
+  CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ();
 
   PostExecuteCurrentState();
 }

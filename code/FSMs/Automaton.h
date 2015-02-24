@@ -28,7 +28,7 @@ public:
   virtual std::string GetTemplateName() = 0;
 #endif
 protected:
-  typedef bool(Automaton::*MethodIndex)();
+  typedef void(Automaton::*MethodIndex)();
   Automaton* m_Parent;
 
   struct transition_info_t

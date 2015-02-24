@@ -452,14 +452,14 @@ public class AZGenericMachineGenerator
                         {
                             if (makeVirtual)
                             {
-                                output.append("  virtual bool "
+                                output.append("  virtual void "
                                         + STATE_METHOD_PREFIX 
                                         + transition.startStateId + "_ON_" 
                                         + transition.eventId + "();\n");
                             }
                             else
                             {
-                                output.append("  bool "
+                                output.append("  void "
                                         + STATE_METHOD_PREFIX 
                                         + transition.startStateId + "_ON_" 
                                         + transition.eventId + "();\n");
@@ -487,13 +487,10 @@ public class AZGenericMachineGenerator
                     {
                         for (Transition transition : transitions)
                         {
-                            output.append("bool " + CLASS_NAME + "::"
+                            output.append("void " + CLASS_NAME + "::"
                                    + STATE_METHOD_PREFIX 
                                    + transition.startStateId + "_ON_" 
-                                   + transition.eventId + "()\n");
-                            output.append("{\n");
-                            output.append("  return false;\n");
-                            output.append("}\n\n");
+                                   + transition.eventId + "() {}\n");
                         }
                     }
                     else if (key.equals("STATE_METHODS_DECLARATIONS_START"))
@@ -507,13 +504,13 @@ public class AZGenericMachineGenerator
                         {
                             if (makeVirtual)
                             {
-                                output.append("  virtual bool "
+                                output.append("  virtual void "
                                         + STATE_METHOD_PREFIX + stateName
                                         + "();\n");
                             }
                             else
                             {
-                                output.append("  bool " + STATE_METHOD_PREFIX
+                                output.append("  void " + STATE_METHOD_PREFIX
                                         + stateName + "();\n");
                             }
                         }
@@ -543,19 +540,19 @@ public class AZGenericMachineGenerator
 
                         for (String stateName : orderedSet)
                         {
-                            output.append("bool " + CLASS_NAME + "::"
-                                    + STATE_METHOD_PREFIX + stateName + "()\n");
-                            output.append("{\n");
+                            output.append("void " + CLASS_NAME + "::"
+                                    + STATE_METHOD_PREFIX + stateName + "()");
                             String code = codeBlocks.get(stateName);
                             if (code != null)
                             {
+                                output.append("{\n");
                                 output.append(code + "\n");
+                                output.append("}\n\n");
                             }
                             else
                             {
-                                output.append("  return false;\n");
+                                output.append(" {}\n");
                             }
-                            output.append("}\n\n");
                         }
                     }
                     else if (key.equals("TABLE_INSERTIONS_START"))
