@@ -1,14 +1,14 @@
 #include "${CLASS_NAME}.h"
 #include "AZ.h"
 
-// States
+// State methods
 ${STATE_METHODS_DEFINITIONS}
 
 // Transition methods
 ${TRANSITION_METHODS_DEFINITIONS}
 
-// Initialization of state machine will be called 
-// by the Automaton constructor.
+// This method needs to be called manually prior to calling any Automaton-based
+// methods.
 void ${CLASS_NAME}::AZInit()
 {
   // Populate hashtable
