@@ -5,7 +5,9 @@
 #ifndef __${CLASS_NAME}__
 #define __${CLASS_NAME}__
 
+#ifdef STATE_DEBUGGING
 #include <string>
+#endif
 
 class AZStateMachine;
 
