@@ -1,3 +1,6 @@
+// ${PREAMBLE_START}
+// ${PREAMBLE_END}
+
 #include "${CLASS_NAME}.h"
 #include "AZ.h"
 
