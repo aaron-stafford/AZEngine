@@ -3,7 +3,10 @@
 //
 
 #include "Automaton.h"
+
+#ifdef STATE_DEBUGGING
 #include <string>
+#endif
 
 #ifndef __${CLASS_NAME}__
 #define __${CLASS_NAME}__
@@ -11,19 +14,19 @@
 class ${CLASS_NAME} : public Automaton
 {
 public:
-  // State index
+  // State indexes
   // ${STATE_INDEXES_START}
   // ${STATE_INDEXES_END}
 
-  // Input index
+  // Input indexes
   // ${INPUT_INDEXES_START}
   // ${INPUT_INDEXES_END}
 
-  // States
+  // State methods
   // ${STATE_METHODS_DECLARATIONS_START}
   // ${STATE_METHODS_DECLARATIONS_END}
 
-  // Transitions methods 
+  // Transition methods 
   // ${TRANSITION_METHODS_DECLARATIONS_START}
   // ${TRANSITION_METHODS_DECLARATIONS_END} 
 
@@ -33,10 +36,8 @@ public:
   // ${DEBUG_ACCESSORS_END}
 #endif
 
-  // Init
   ${CLASS_NAME}();
   virtual ~${CLASS_NAME}();
-
   virtual void AZInit();
 private:
 #ifdef STATE_DEBUGGING
