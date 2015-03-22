@@ -409,6 +409,18 @@ public class CodeGenerator extends AZGenericMachineGenerator
                 writeToFile(automatonH, "Automaton.h");
             }
 
+            String tcpClientCPP = getPackageFileAsString("TCPClient.cpp");
+            writeToFile(tcpClientCPP, "TCPClient.cpp");
+
+            String tcpClientH = getPackageFileAsString("TCPClient.h");
+            writeToFile(tcpClientH, "TCPClient.h");
+
+            String stateDebuggerCPP = getPackageFileAsString("StateDebugger.cpp");
+            writeToFile(stateDebuggerCPP, "StateDebugger.cpp");
+
+            String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
+            writeToFile(stateDebuggerH, "StateDebugger.h");
+
             System.exit(0);
         }
         

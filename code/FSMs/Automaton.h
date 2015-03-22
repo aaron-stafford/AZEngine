@@ -3,6 +3,7 @@
 
 #ifdef STATE_DEBUGGING
 #include <string>
+#include "StateDebugger.h"
 #endif
 
 #include <list>
@@ -44,6 +45,12 @@ protected:
 
   transition_info_t m_CurrentInfo;
   transition_info_t m_PreviousInfo;
+  transition_info_t m_InitialInfo;
+
+  void SetInitialInfo(transition_info_t a_InitialInfo);
+#ifdef STATE_DEBUGGING
+  StateDebugger m_StateDebugger;
+#endif
 };
 
 #endif

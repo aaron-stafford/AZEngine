@@ -18,10 +18,6 @@ void ${CLASS_NAME}::AZInit()
   // Populate hashtable
   // ${TABLE_INSERTIONS_START}
   // ${TABLE_INSERTIONS_END}
-  
-  // Set initial state
-  // ${INITIAL_STATE_START}
-  // ${INITIAL_STATE_END}
 
 #ifdef STATE_DEBUGGING
   // Populate debug input index
@@ -32,6 +28,10 @@ void ${CLASS_NAME}::AZInit()
   // ${POPULATE_DEBUG_STATE_INDEX_START}
   // ${POPULATE_DEBUG_STATE_INDEX_END}
 #endif
+  
+  // Set initial state
+  // ${INITIAL_STATE_START}
+  // ${INITIAL_STATE_END}
 }
 
 ${CLASS_NAME}::${CLASS_NAME}()

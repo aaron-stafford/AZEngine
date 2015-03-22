@@ -27,10 +27,6 @@ TCPClient::TCPClient(): m_Connected(false)
   {
     std::cout << "failed to acquire socket descriptor" << std::endl;
   }
-  else
-  {
-    std::cout << "socket descriptor acquired: " << m_sd << std::endl;
-  }
   
   inet_pton(AF_INET, HOST, &ipv4addr);
   
@@ -39,10 +35,6 @@ TCPClient::TCPClient(): m_Connected(false)
   if(hp == NULL)
   {
     std::cout << "failed to host by address" << std::endl;
-  }
-  else
-  {
-    std::cout << "Got host by address" << std::endl;
   }
   
   server.sin_family = AF_INET;
@@ -69,21 +61,15 @@ void TCPClient::Send(const std::string& message)
 {
   if(!m_Connected)
   {
-    std::cout << "Not sending message. Not connected" << std::endl;
     return;
   }
 
-  std::cout << "Sending message: " << message << std::endl;
   ssize_t bytesSent = send(m_sd, (char *)message.c_str(), strlen((char *)message.c_str()), 0);
 
   if(bytesSent == -1)
   {
     std::cout << "failed to send message" << std::endl;
     std::cout << "Reason: " << strerror(errno) << std::endl;
-  }
-  else
-  {
-    std::cout << "Sent: " << bytesSent << " byte(s) to server" << std::endl;
   }
 
   bzero(m_Buffer, 256);
@@ -92,10 +78,6 @@ void TCPClient::Send(const std::string& message)
   {
     std::cout << "failed to read from socket" << std::endl;
     std::cout << "Reason: " << strerror(errno) << std::endl;
-  }
-  else
-  {
-    std::cout << "Response from server: " << m_Buffer <<  std::endl;
   }
 }
 

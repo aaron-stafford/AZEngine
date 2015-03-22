@@ -117,6 +117,10 @@
         <copy file="FSMs/AZ.t.hpp" todir="build/classes/az"/>
         <copy file="FSMs/Automaton.h" todir="build/classes/az"/>
         <copy file="FSMs/Automaton.cpp" todir="build/classes/az"/>
+        <copy file="FSMs/TCPClient.h" todir="build/classes/az"/>
+        <copy file="FSMs/TCPClient.cpp" todir="build/classes/az"/>
+        <copy file="FSMs/StateDebugger.h" todir="build/classes/az"/>
+        <copy file="FSMs/StateDebugger.cpp" todir="build/classes/az"/>
     </target>
 
     <target name="jar">

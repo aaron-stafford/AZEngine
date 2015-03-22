@@ -1,14 +1,7 @@
 #include "Automaton.h"
 #include "AZ.h"
 
-#ifdef STATE_DEBUGGING
-#include "TCPClient.h"
-#include <iostream>
-#endif
-
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-
-static TCPClient m_GraphicalDebugger;
 
 Automaton::Automaton()
 {
@@ -28,14 +21,7 @@ Automaton::~Automaton()
 void Automaton::AZExecuteCurrentState()
 {
   PreExecuteCurrentState();
-
-#ifdef STATE_DEBUGGING
-  std::cout << GetStateAsText(m_CurrentInfo.stateIndex) << std::endl;
-  m_GraphicalDebugger.Send("1 " + GetStateAsText(m_CurrentInfo.stateIndex) + "\n");
-#endif
-
   CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ();
-
   PostExecuteCurrentState();
 }
 
@@ -52,8 +38,7 @@ void Automaton::AZProcessInput(int a_Input)
   }
 
 #ifdef STATE_DEBUGGING
-  std::cout << GetInputAsText(a_Input) << std::endl;
-  m_GraphicalDebugger.Send("3 " + GetStateAsText(m_PreviousInfo.stateIndex) + " -> " + GetStateAsText(m_CurrentInfo.stateIndex) + "\n");
+  m_StateDebugger.Transition(GetStateAsText(m_PreviousInfo.stateIndex), GetInputAsText(a_Input), GetStateAsText(m_CurrentInfo.stateIndex));
 #endif
 
   // Call the transition method
@@ -98,3 +83,11 @@ void Automaton::SetParent(Automaton* a_Parent)
   m_Parent = a_Parent;
 }
 
+void Automaton::SetInitialInfo(transition_info_t a_InitialInfo)
+{
+  m_InitialInfo = a_InitialInfo;
+
+#ifdef STATE_DEBUGGING
+  m_StateDebugger.StateEntered(GetStateAsText(m_InitialInfo.stateIndex));
+#endif
+}

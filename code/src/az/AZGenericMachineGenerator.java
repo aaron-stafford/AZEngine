@@ -663,6 +663,7 @@ public class AZGenericMachineGenerator
 
                         output.append("  m_CurrentInfo = info;\n");
                         output.append("  m_PreviousInfo = info;\n");
+                        output.append("  SetInitialInfo(info);\n");
 
                         while (templateReader.ready())
                         {
