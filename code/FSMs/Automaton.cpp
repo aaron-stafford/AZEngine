@@ -35,14 +35,14 @@ void Automaton::AZProcessInput(int a_Input)
     m_PreviousInfo = m_CurrentInfo;
 #endif
     m_CurrentInfo = newState;
-  }
 
 #ifdef STATE_DEBUGGING
-  m_StateDebugger.Transition(GetStateAsText(m_PreviousInfo.stateIndex), GetInputAsText(a_Input), GetStateAsText(m_CurrentInfo.stateIndex));
+    m_StateDebugger.Transition(GetStateAsText(m_PreviousInfo.stateIndex), GetInputAsText(a_Input), GetStateAsText(m_CurrentInfo.stateIndex));
 #endif
 
-  // Call the transition method
-  CALL_MEMBER_FN(*this, m_CurrentInfo.transitionMethod) ();
+    // Call the transition method
+    CALL_MEMBER_FN(*this, m_CurrentInfo.transitionMethod) ();
+  }
 }
 
 void Automaton::AZInit()
