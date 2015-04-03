@@ -26,6 +26,10 @@ void ${CLASS_NAME}::AZInit()
   // Populate debug state index
   // ${POPULATE_DEBUG_STATE_INDEX_START}
   // ${POPULATE_DEBUG_STATE_INDEX_END}
+
+  // Set diagram name on debugger
+  // ${SET_DIAGRAM_NAME_ON_DEBUGGER_START}
+  // ${SET_DIAGRAM_NAME_ON_DEBUGGER_END}
 #endif
   
   // Set initial state

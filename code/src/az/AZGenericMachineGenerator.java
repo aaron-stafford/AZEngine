@@ -712,6 +712,28 @@ public class AZGenericMachineGenerator
                             }
                         }
                     }
+                    else if (key.equals("SET_DIAGRAM_NAME_ON_DEBUGGER_START"))
+                    {
+                        output.append(s + "\n");
+                        output.append("  m_StateDebugger.SetDiagramName(GetTemplateName());\n");
+  
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("SET_DIAGRAM_NAME_ON_DEBUGGER_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     else if (key.equals("DEBUG_ACCESSORS_START"))
                     {
                         output.append(s + "\n");
@@ -729,7 +751,8 @@ public class AZGenericMachineGenerator
 
                         output.append("  inline std::string GetTemplateName()\n");
                         output.append("  {\n");
-                        output.append("      return std::string(\"" + inputFile + "\");\n");
+                        File f = new File(inputFile);
+                        output.append("      return std::string(\"" + f.getName() + "\");\n");
                         output.append("  }\n");
 
                         while (templateReader.ready())
