@@ -392,34 +392,34 @@ public class CodeGenerator extends AZGenericMachineGenerator
         if (outputAutomaton)
         {
             String azCPP = getPackageFileAsString("AZ.cpp");
-            writeToFile(azCPP, "AZ.cpp");
+            writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
 
             String azH = getPackageFileAsString("AZ.h");
-            writeToFile(azH, "AZ.h");
+            writeToFile(azH, OUTPUT_PATH + "AZ.h");
 
             String azHPP = getPackageFileAsString("AZ.t.hpp");
-            writeToFile(azHPP, "AZ.t.hpp");
+            writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
 
             if (derived)
             {
                 String automatonCPP = getPackageFileAsString("Automaton.cpp");
-                writeToFile(automatonCPP, "Automaton.cpp");
+                writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
 
                 String automatonH = getPackageFileAsString("Automaton.h");
-                writeToFile(automatonH, "Automaton.h");
+                writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
             }
 
             String tcpClientCPP = getPackageFileAsString("TCPClient.cpp");
-            writeToFile(tcpClientCPP, "TCPClient.cpp");
+            writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
 
             String tcpClientH = getPackageFileAsString("TCPClient.h");
-            writeToFile(tcpClientH, "TCPClient.h");
+            writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
 
             String stateDebuggerCPP = getPackageFileAsString("StateDebugger.cpp");
-            writeToFile(stateDebuggerCPP, "StateDebugger.cpp");
+            writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
 
             String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
-            writeToFile(stateDebuggerH, "StateDebugger.h");
+            writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
 
             System.exit(0);
         }

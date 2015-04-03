@@ -83,3 +83,9 @@ Command line args
 
   Writes out AZ.h, AZ.cpp, Automaton.h and Automaton.cpp  the default
   implementation of the FSM.  These files are needed to compile generated code. 
+
+--output-path output_path
+
+  Specifies the path to write output files to. For example, if used with 
+  --output-automaton, the automaton files will be written to the directory 
+  specified by output_path. output_path must exist.
