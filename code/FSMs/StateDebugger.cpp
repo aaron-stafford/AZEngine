@@ -23,9 +23,9 @@ void StateDebugger::StateExited(const std::string& a_State) const
 
 void StateDebugger::Transition(const std::string& a_PreviousState, const std::string& a_Input, const std::string& a_NewState) const
 {
-  //StateExited(a_PreviousState);
+  StateExited(a_PreviousState);
   m_GraphicalDebugger.Send("3 " + a_PreviousState + " -> " + a_NewState + "\n");
-  //m_GraphicalDebugger.Send("2 " + a_PreviousState + " -> " + a_NewState + "\n");
+  m_GraphicalDebugger.Send("2 " + a_PreviousState + " -> " + a_NewState + "\n");
   StateEntered(a_NewState);
 }
 
