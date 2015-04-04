@@ -107,7 +107,7 @@
 
     <target name="compile" depends="clean">
         <mkdir dir="build/classes"/>
-        <javac srcdir="src" destdir="build/classes"/>
+        <javac target="1.6" source="1.6" srcdir="src" destdir="build/classes"/>
         <copy file="templates/cpp.template" todir="build/classes/az"/>
         <copy file="templates/h.template" todir="build/classes/az"/>
         <copy file="templates/cpp.derived.template" todir="build/classes/az"/>
