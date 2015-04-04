@@ -3,6 +3,7 @@
 #include <string>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 //Network related includes:
 #include <sys/socket.h>

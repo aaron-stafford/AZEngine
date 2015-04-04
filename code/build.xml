@@ -1,4 +1,4 @@
-<project name="Generator">
+<project name="Generator" default="jar">
 	<property name="output.path" location=""/>
 	<property name="generator" location="build/jar/AZClassGenerator.jar"/>
 
@@ -105,7 +105,7 @@
         <delete dir="build"/>
     </target>
 
-    <target name="compile">
+    <target name="compile" depends="clean">
         <mkdir dir="build/classes"/>
         <javac srcdir="src" destdir="build/classes"/>
         <copy file="templates/cpp.template" todir="build/classes/az"/>
@@ -123,7 +123,7 @@
         <copy file="FSMs/StateDebugger.cpp" todir="build/classes/az"/>
     </target>
 
-    <target name="jar">
+    <target name="jar" depends="compile">
         <mkdir dir="build/jar"/>
         <jar destfile="build/jar/AZClassGenerator.jar" basedir="build/classes">
             <manifest>

@@ -13,11 +13,15 @@
 class Automaton
 {
 public:
-  // Init
   Automaton();
   ~Automaton();
   void AZExecuteCurrentState();
   void AZProcessInput(int input);
+
+  /**
+   * Sets the current state to the initial state.
+   */
+  void Reset();
   virtual void AZInit();
   virtual void PreExecuteCurrentState();
   virtual void PostExecuteCurrentState();
@@ -52,10 +56,4 @@ protected:
   StateDebugger m_StateDebugger;
 #endif
 };
-
 #endif
-
-
-
-
-

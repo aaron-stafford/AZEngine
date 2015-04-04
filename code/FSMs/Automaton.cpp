@@ -45,6 +45,20 @@ void Automaton::AZProcessInput(int a_Input)
   }
 }
 
+void Automaton::Reset()
+{
+#ifdef STATE_DEBUGGING
+    m_StateDebugger.StateExited(GetStateAsText(m_CurrentInfo.stateIndex));
+#endif
+
+  m_CurrentInfo = m_InitialInfo;
+  m_PreviousInfo = m_InitialInfo;
+
+#ifdef STATE_DEBUGGING
+    m_StateDebugger.StateEntered(GetStateAsText(m_CurrentInfo.stateIndex));
+#endif
+}
+
 void Automaton::AZInit()
 {
 }
