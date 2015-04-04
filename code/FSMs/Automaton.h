@@ -15,14 +15,14 @@ class Automaton
 public:
   Automaton();
   ~Automaton();
-  void AZExecuteCurrentState();
-  void AZProcessInput(int input);
+  void ExecuteCurrentState();
+  void ProcessInput(int input);
 
   /**
    * Sets the current state to the initial state.
    */
   void Reset();
-  virtual void AZInit();
+  virtual void InitAutomaton();
   virtual void PreExecuteCurrentState();
   virtual void PostExecuteCurrentState();
   void AddChild(Automaton* a_Child, bool a_IsPreExecute, bool a_IsPostExecute);

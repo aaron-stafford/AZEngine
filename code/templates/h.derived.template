@@ -37,7 +37,7 @@ public:
 
   ${CLASS_NAME}();
   virtual ~${CLASS_NAME}();
-  virtual void AZInit();
+  virtual void InitAutomaton();
 private:
 #ifdef STATE_DEBUGGING
   // Debug input index entries 

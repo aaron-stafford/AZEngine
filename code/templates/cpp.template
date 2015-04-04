@@ -13,7 +13,7 @@ ${STATE_METHODS_DEFINITIONS}
 ${TRANSITION_METHODS_DEFINITIONS}
 
 // Initialization of state machine
-void ${CLASS_NAME}::AZInit()
+void ${CLASS_NAME}::InitAutomaton()
 {
   // Populate hashtable
   // ${TABLE_INSERTIONS_START}
@@ -41,7 +41,7 @@ void ${CLASS_NAME}::AZInit()
 ${CLASS_NAME}::${CLASS_NAME}()
 {
   stateMachine = new AZStateMachine();
-  AZInit();
+  InitAutomaton();
 }
 
 ${CLASS_NAME}::~${CLASS_NAME}()
@@ -49,13 +49,13 @@ ${CLASS_NAME}::~${CLASS_NAME}()
   delete stateMachine;
 }
 
-void ${CLASS_NAME}::AZExecuteCurrentState()
+void ${CLASS_NAME}::ExecuteCurrentState()
 {
   while(CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ())
     ;
 }
 
-void ${CLASS_NAME}::AZProcessInput(int input)
+void ${CLASS_NAME}::ProcessInput(int input)
 {
   transition_info_t newState = stateMachine.GetNextState(0, m_CurrentState, a_Input);
 

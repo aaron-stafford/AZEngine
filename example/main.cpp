@@ -5,11 +5,10 @@
 int main(int argc, char** argv)
 {
   AZExample example;
-  example.AZInit();
-
+  example.InitAutomaton();
   for(int i = 0; i < 100; i++)
   {
-    example.AZProcessInput(AZExample::A);
+    example.ProcessInput(AZExample::A);
     sleep(2);
   }
   std::cout << "Done:" << std::endl;

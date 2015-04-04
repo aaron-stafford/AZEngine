@@ -18,14 +18,14 @@ Automaton::~Automaton()
   m_PostExecuteStateChildren.clear();
 }
 
-void Automaton::AZExecuteCurrentState()
+void Automaton::ExecuteCurrentState()
 {
   PreExecuteCurrentState();
   CALL_MEMBER_FN(*this, m_CurrentInfo.stateMethod) ();
   PostExecuteCurrentState();
 }
 
-void Automaton::AZProcessInput(int a_Input)
+void Automaton::ProcessInput(int a_Input)
 {
   transition_info_t newState = stateMachine.GetNextState(0, m_CurrentInfo.stateIndex, a_Input);
 
@@ -59,7 +59,7 @@ void Automaton::Reset()
 #endif
 }
 
-void Automaton::AZInit()
+void Automaton::InitAutomaton()
 {
 }
 
@@ -67,7 +67,7 @@ void Automaton::PreExecuteCurrentState()
 {
     for(std::list<Automaton*>::const_iterator iterator = m_PreExecuteStateChildren.begin(); iterator != m_PreExecuteStateChildren.end(); ++iterator)
     {
-      ((Automaton*)*iterator)->AZExecuteCurrentState();
+      ((Automaton*)*iterator)->ExecuteCurrentState();
     }
 }
 
@@ -75,7 +75,7 @@ void Automaton::PostExecuteCurrentState()
 {
     for(std::list<Automaton*>::const_iterator iterator = m_PostExecuteStateChildren.begin(); iterator != m_PostExecuteStateChildren.end(); ++iterator)
     {
-      ((Automaton*)*iterator)->AZExecuteCurrentState();
+      ((Automaton*)*iterator)->ExecuteCurrentState();
     }
 }
 

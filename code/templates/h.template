@@ -35,14 +35,13 @@ public:
   // ${DEBUG_ACCESSORS_END}
 #endif
  
-  // Init
   ${CLASS_NAME}();
   virtual ~${CLASS_NAME}();
-  void AZExecuteCurrentState();
-  void AZProcessInput(int input);
+  void ExecuteCurrentState();
+  void ProcessInput(int input);
 private:
   AZStateMachine* stateMachine;
-  void AZInit();
+  void InitAutomaton();
   typedef bool(${CLASS_NAME}::*MethodIndex)();
   MethodIndex* mi;
 

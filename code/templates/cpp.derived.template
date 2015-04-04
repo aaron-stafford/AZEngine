@@ -12,7 +12,7 @@ ${TRANSITION_METHODS_DEFINITIONS}
 
 // This method needs to be called manually prior to calling any Automaton-based
 // methods.
-void ${CLASS_NAME}::AZInit()
+void ${CLASS_NAME}::InitAutomaton()
 {
   // Populate hashtable
   // ${TABLE_INSERTIONS_START}
