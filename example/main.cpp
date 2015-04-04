@@ -1,27 +1,17 @@
 #include "AZExample.h"
-#include "AZNewExample.h"
 #include <iostream>
+#include <unistd.h>
 
 int main(int argc, char** argv)
 {
-  AZNewExample newExample;
-  newExample.AZInit();
-  newExample.AZExecuteCurrentState();
-  newExample.AZProcessInput(AZNewExample::a);
-  newExample.AZExecuteCurrentState();
-  newExample.AZProcessInput(AZNewExample::b);
-  newExample.AZExecuteCurrentState();
-/*
-
   AZExample example;
   example.AZInit();
 
-  example.AZExecuteCurrentState();
-  example.AZProcessInput(AZExample::Loading);
-  example.AZExecuteCurrentState();
-  example.AZProcessInput(AZExample::FadeInited);
-  example.AZExecuteCurrentState();
-*/
+  for(int i = 0; i < 100; i++)
+  {
+    example.AZProcessInput(AZExample::A);
+    sleep(2);
+  }
   std::cout << "Done:" << std::endl;
   return 0;
 }

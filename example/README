@@ -1,0 +1,21 @@
+Run the following commands to build the example:
+
+./cleanDirectory.sh
+./generateFSMs.sh
+./compileExample.sh
+
+Launch the editor:
+
+java -jar ../fsm-editor.jar
+
+Go to "File" => "Open file".
+
+Select example.scxml in the example/scxml directory.
+
+In the menu, select: "Tools" => "SCXML execution listener"
+
+When the dialog appears, in the port field, type: 7777 and click on Start.
+
+Back on the commandline, run: ./a.out
+
+In the editor, states and transitions light up as they are executed in code.

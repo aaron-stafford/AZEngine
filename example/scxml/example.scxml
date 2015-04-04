@@ -1,109 +1,32 @@
-<scxml initial="INIT" name="Flappy" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=2550 h=1790  -->
- <state id="INIT"><!--   node-size-and-position x=1160 y=360 w=75 h=75  -->
-  <transition event="Loading" target="INIT_FADE"><!--   edge-path [INIT_FADE]  pointx=0 pointy=29 offsetx=-1 offsety=-16  --></transition>
+<scxml initial="new_node86" name="Example" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=1100 h=890  -->
+ <state id="new_node86"><!--   node-size-and-position x=70 y=410 w=75 h=75  -->
+  <transition event="A" target="new_node88"></transition>
  </state>
- <state id="READY"><!--   node-size-and-position x=1590 y=780 w=75 h=75  -->
-  <onentry>Show World</onentry>
-  <transition event="TouchDown" target="GAME_INIT"></transition>
-  <transition event="TapDownAnim" target="INIT_TAP_DOWN"></transition>
+ <state id="new_node88"><!--   node-size-and-position x=220 y=410 w=75 h=75  -->
+  <transition event="A" target="new_node91"></transition>
  </state>
- <state id="GAME"><!--   node-size-and-position x=1480 y=1210 w=75 h=75  -->
-  <transition event="TouchDown" target="FLAPPED"><!--   edge-path [FLAPPED]  x=1660 y=1210 pointx=0 pointy=-19 offsetx=-22 offsety=-8  --></transition>
-  <transition event="Finished" target="INIT_FADE_TO_THE_END"></transition>
-  <transition event="HitGround" target="HIT_GROUND"><!--   edge-path [HIT_GROUND]  pointx=-1 pointy=17 offsetx=0 offsety=-20  --></transition>
-  <transition event="HitPillar" target="PILLAR_HIT"><!--   edge-path [PILLAR_HIT]  pointx=-1 pointy=2 offsetx=-31 offsety=14  --></transition>
+ <state id="new_node91"><!--   node-size-and-position x=370 y=410 w=75 h=75  -->
+  <transition event="A" target="new_node94"></transition>
  </state>
- <state id="FLAPPED"><!--   node-size-and-position x=1710 y=1300 w=75 h=75  -->
-  <transition event="Flapped" target="GAME"><!--   edge-path [GAME]  x=1640 y=1380 pointx=-1 pointy=-13 offsetx=-37 offsety=-23  --></transition>
+ <state id="new_node94"><!--   node-size-and-position x=470 y=260 w=75 h=75  -->
+  <transition event="A" target="new_node97"></transition>
  </state>
- <state id="INIT_FADE"><!--   node-size-and-position x=1160 y=490 w=75 h=75  -->
-  <transition event="FadeInited" target="UPDATE_FADE"></transition>
+ <state id="new_node97"><!--   node-size-and-position x=600 y=180 w=75 h=75  -->
+  <transition event="A" target="new_node100"></transition>
  </state>
- <state id="GAME_INIT"><!--   node-size-and-position x=1600 y=1010 w=75 h=75  -->
-  <transition event="GameInited" target="GAME"></transition>
+ <state id="new_node100"><!--   node-size-and-position x=730 y=260 w=75 h=75  -->
+  <transition event="A" target="new_node103"></transition>
  </state>
- <state id="PILLAR_HIT"><!--   node-size-and-position x=1510 y=1440 w=80 h=70  -->
-  <transition event="HitOver" target="DYING"></transition>
+ <state id="new_node103"><!--   node-size-and-position x=830 y=410 w=75 h=75  -->
+  <transition event="A" target="new_node106"></transition>
  </state>
- <state id="INIT_RESTART"><!--   node-size-and-position x=960 y=490 w=100 h=80  -->
-  <transition event="InitOver" target="INIT_FADE"></transition>
+ <state id="new_node106"><!--   node-size-and-position x=730 y=560 w=75 h=75  -->
+  <transition event="A" target="new_node109"></transition>
  </state>
- <state id="INIT_READY"><!--   node-size-and-position x=1540 y=590 w=75 h=75  -->
-  <transition event="ReadyInited" target="READY"></transition>
+ <state id="new_node109"><!--   node-size-and-position x=600 y=650 w=75 h=75  -->
+  <transition event="A" target="new_node112"></transition>
  </state>
- <state id="UPDATE_FADE"><!--   node-size-and-position x=1350 y=510 w=100 h=80  -->
-  <transition event="FadeComplete" target="INIT_READY"></transition>
- </state>
- <state id="GAME_OVER"><!--   node-size-and-position x=390 y=690 w=90 h=80  -->
-  <transition event="TouchDown" target="INIT_GAME_OVER_FADE_OUT"><!--   edge-path [INIT_GAME_OVER_FADE_OUT]  pointx=0 pointy=19 offsetx=-5 offsety=6  --></transition>
- </state>
- <state id="DYING"><!--   node-size-and-position x=1310 y=1450 w=75 h=75  -->
-  <transition event="HitGround" target="HIT_GROUND"></transition>
- </state>
- <state id="INIT_GAME_OVER_FADE_OUT"><!--   node-size-and-position x=470 y=510 w=170 h=80  -->
-  <transition event="FadeInited" target="GAME_OVER_FADE_OUT"></transition>
- </state>
- <state id="GAME_OVER_FADE_OUT"><!--   node-size-and-position x=720 y=480 w=160 h=80  -->
-  <transition event="FadeComplete" target="INIT_RESTART"></transition>
- </state>
- <state id="INIT_GAME_OVER"><!--   node-size-and-position x=340 y=870 w=110 h=80  -->
-  <transition event="Inited" target="GAME_OVER"></transition>
- </state>
- <state id="GAME_OVER_ANIM"><!--   node-size-and-position x=910 y=1440 w=120 h=80  -->
-  <transition event="FinishGameOverAnim" target="GAME_OVER_ANIM_END"><!--   edge-path [GAME_OVER_ANIM_END]  x=1010 y=1580 pointx=0 pointy=17 offsetx=25 offsety=-40  --></transition>
-  <transition event="TouchDown" target="GAME_OVER_ANIM_END"><!--   edge-path [GAME_OVER_ANIM_END]  x=890 y=1540  --></transition>
- </state>
- <state id="SHOW_SCORES"><!--   node-size-and-position x=480 y=1480 w=100 h=80  -->
-  <transition event="FinishShowScores" target="SHOW_SCORES_END"><!--   edge-path [SHOW_SCORES_END]  x=440 y=1430  --></transition>
-  <transition event="TouchDown" target="SHOW_SCORES_END"><!--   edge-path [SHOW_SCORES_END]  x=530 y=1410  --></transition>
- </state>
- <state id="INIT_SHOW_SCORES"><!--   node-size-and-position x=640 y=1360 w=140 h=80  -->
-  <transition event="Inited" target="SHOW_SCORES"></transition>
- </state>
- <state id="HIT_GROUND"><!--   node-size-and-position x=1290 y=1220 w=100 h=80  -->
-  <transition event="GroundHitOver" target="INIT_GAME_OVER_ANIM"><!--   edge-path [INIT_GAME_OVER_ANIM]  pointx=0 pointy=-10 offsetx=25 offsety=-5  --></transition>
- </state>
- <state id="INIT_GAME_OVER_ANIM"><!--   node-size-and-position x=1060 y=1270 w=140 h=80  -->
-  <transition event="Inited" target="GAME_OVER_ANIM"></transition>
- </state>
- <state id="GAME_OVER_ANIM_END"><!--   node-size-and-position x=770 y=1580 w=140 h=70  -->
-  <transition event="GameOverAnimComplete" target="INIT_SHOW_SCORES"></transition>
- </state>
- <state id="SHOW_SCORES_END"><!--   node-size-and-position x=350 y=1260 w=130 h=80  -->
-  <transition event="ShowScoresComplete" target="INIT_GAME_OVER"></transition>
- </state>
- <state id="INIT_TAP_DOWN"><!--   node-size-and-position x=1750 y=680 w=110 h=80  -->
-  <transition event="Inited" target="TAP_DOWN"></transition>
- </state>
- <state id="TAP_DOWN"><!--   node-size-and-position x=1860 y=820 w=75 h=75  -->
-  <transition event="TapUpAnim" target="INIT_TAP_UP"></transition>
-  <transition event="TouchDown" target="GAME_INIT"><!--   edge-path [GAME_INIT]  x=1830 y=1040  --></transition>
- </state>
- <state id="INIT_TAP_UP"><!--   node-size-and-position x=1690 y=890 w=90 h=80  -->
-  <transition event="Inited" target="READY"></transition>
- </state>
- <state id="THE_END"><!--   node-size-and-position x=1070 y=840 w=75 h=75  -->
-  <transition event="TouchDown" target="INIT_THE_END_FADE_OUT"></transition>
- </state>
- <state id="INIT_FADE_TO_THE_END"><!--   node-size-and-position x=1420 y=1030 w=150 h=80  -->
-  <transition event="Inited" target="FADE_TO_THE_END"></transition>
- </state>
- <state id="FADE_TO_THE_END"><!--   node-size-and-position x=1380 y=870 w=120 h=80  -->
-  <transition event="Finished" target="LEAVE_BLANK"></transition>
- </state>
- <state id="INIT_THE_END_FADE_IN"><!--   node-size-and-position x=1200 y=1070 w=140 h=80  -->
-  <transition event="Inited" target="THE_END_FADE_IN"></transition>
- </state>
- <state id="THE_END_FADE_IN"><!--   node-size-and-position x=1020 y=1000 w=110 h=80  -->
-  <transition event="Finished" target="THE_END"></transition>
- </state>
- <state id="LEAVE_BLANK"><!--   node-size-and-position x=1210 y=920 w=100 h=80  -->
-  <transition event="Finished" target="INIT_THE_END_FADE_IN"></transition>
- </state>
- <state id="INIT_THE_END_FADE_OUT"><!--   node-size-and-position x=1020 y=700 w=75 h=75  -->
-  <transition event="Inited" target="THE_END_FADE_OUT"></transition>
- </state>
- <state id="THE_END_FADE_OUT"><!--   node-size-and-position x=1170 y=640 w=75 h=75  -->
-  <transition event="Finished" target="INIT_FADE"></transition>
+ <state id="new_node112"><!--   node-size-and-position x=470 y=560 w=75 h=75  -->
+  <transition event="A" target="new_node91"></transition>
  </state>
 </scxml>
