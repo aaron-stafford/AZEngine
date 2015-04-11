@@ -108,7 +108,6 @@ public class CodeGenerator extends AZGenericMachineGenerator
         CodeGenerator.inputFile = diagram;
         CodeGenerator.CLASS_NAME = className;
         jenny.init();
-
         BufferedReader in = null;
 
         try
@@ -176,10 +175,19 @@ public class CodeGenerator extends AZGenericMachineGenerator
     
     public static void generateCPPFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived)
     {
+        String fileBaseName = outputPath;
+        if(fileBaseName == null)
+        {
+            fileBaseName = "";
+        }
+        if(!fileBaseName.equals("") && !fileBaseName.endsWith(File.separator))
+        {
+            fileBaseName += File.separator;
+        }
         String cppCode = generateCPP(diagram, className, makeVirtual, derived);
-        writeToFile(cppCode, className + ".cpp");
+        writeToFile(cppCode, fileBaseName + className + ".cpp");
         String hCode = generateH(diagram, className, makeVirtual, derived);
-        writeToFile(hCode, className + ".h");
+        writeToFile(hCode, fileBaseName + className + ".h");
     }
 
     public static void generateDefaultCPPFiles(String diagram, String className, String outputPath)
@@ -255,6 +263,10 @@ public class CodeGenerator extends AZGenericMachineGenerator
     {
       String diagram = ((Element)node).getAttribute("diagram");
       String baseClass = ((Element)node).getAttribute("baseClass");
+      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
+      {
+        return;
+      }
       String virtual = ((Element)node).getAttribute("makeVirtual");
       boolean makeVirtual = CodeGenerator.makeVirtual;
       if(virtual != null && !virtual.equals(""))
@@ -291,11 +303,12 @@ public class CodeGenerator extends AZGenericMachineGenerator
           System.exit(1);
         }
       }
-      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
+      String outputPath = ((Element)node).getAttribute("outputPath");
+      if(outputPath == null)
       {
-        return;
+        outputPath = "";
       }
-      generateCPPFiles(diagram, baseClass, "", makeVirtual, derived);
+      generateCPPFiles(diagram, baseClass, outputPath, makeVirtual, derived);
     }
 
     public static void main(String[] args)

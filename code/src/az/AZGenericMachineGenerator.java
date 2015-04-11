@@ -51,6 +51,11 @@ public class AZGenericMachineGenerator
      */
     public void init()
     {
+        stateIndex.clear();
+        eventIndex.clear();
+        codeBlocks.clear();
+        transitions.clear();
+        codeTransitions.clear();
         populateIndexes();
         generateDatabase();
     }
