@@ -23,6 +23,13 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.w3c.dom.Document;
+
 public class CodeGenerator extends AZGenericMachineGenerator
 {
     static String CLASS_NAME_PREFIX = "AZ";
@@ -34,6 +41,7 @@ public class CodeGenerator extends AZGenericMachineGenerator
     static String OUTPUT_PATH = "";
     static String STATE_DIAGRAM = null;
     static ArrayList<String> fileTypes = new ArrayList<String>();
+    static String projectFile;
 
     // Overwrite existing implementation files?
     static boolean forceOverwrite = false;
@@ -132,9 +140,33 @@ public class CodeGenerator extends AZGenericMachineGenerator
         return generate(diagram, template, className, makeVirtual);
     }
 
+    public static String generateCPP(String diagram, String className, boolean makeVirtual, boolean derived)
+    {
+        if(derived)
+        {
+          return generate(diagram, TEMPLATE_DERIVED_CPP, className, makeVirtual);
+        }
+        else
+        {
+          return generate(diagram, TEMPLATE_CPP, className, makeVirtual);
+        }
+    }
+
     public static String generateDefaultCPP(String diagram, String className)
     {
         return generateDefault(diagram, TEMPLATE_CPP, className);
+    }
+
+    public static String generateH(String diagram, String className, boolean makeVirtual, boolean derived)
+    {
+        if(derived)
+        {
+          return generate(diagram, TEMPLATE_DERIVED_H, className, makeVirtual);
+        }
+        else
+        {
+          return generate(diagram, TEMPLATE_H, className, makeVirtual);
+        }
     }
 
     public static String generateDefaultH(String diagram, String className)
@@ -142,14 +174,19 @@ public class CodeGenerator extends AZGenericMachineGenerator
         return generateDefault(diagram, TEMPLATE_H, className);
     }
     
+    public static void generateCPPFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived)
+    {
+        String cppCode = generateCPP(diagram, className, makeVirtual, derived);
+        writeToFile(cppCode, className + ".cpp");
+        String hCode = generateH(diagram, className, makeVirtual, derived);
+        writeToFile(hCode, className + ".h");
+    }
+
     public static void generateDefaultCPPFiles(String diagram, String className, String outputPath)
     {
         String cppCode = generateDefaultCPP(diagram, className);
-        
         writeToFile(cppCode, className + ".cpp");
-        
         String hCode = generateDefaultH(diagram, className);
-        
         writeToFile(hCode, className + ".h");
     }
     
@@ -166,6 +203,99 @@ public class CodeGenerator extends AZGenericMachineGenerator
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    public static void generateFromProject(String projectFile)
+    {
+      try
+      {
+        File file = new File(projectFile);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(file);
+        generateFromProject(document);
+      }
+      catch(Exception e)
+      {
+        e.printStackTrace();
+        System.exit(1);
+      }
+    }
+
+    public static void generateFromProject(Document projectDocument)
+    {
+      if (projectDocument == null)
+      {
+        System.err.println("Invalid projectDocument");
+        System.exit(1);
+      }
+      recursivelyGenerateFromNode((Node)projectDocument);
+    }
+
+    public static void recursivelyGenerateFromNode(Node node)
+    {
+      if(node.getNodeName().equals("automaton"))
+      {
+        generateFromProjectNode(node);
+        // Need to be recursive at this point.
+      }
+      NodeList list = node.getChildNodes();
+ 
+      for (int i = 0 ; i < list.getLength() ; i++)
+      {
+        Node innerNode = list.item(i);
+        if (innerNode.getNodeType() == Node.ELEMENT_NODE)
+        {
+          recursivelyGenerateFromNode(innerNode);
+        }
+      }
+    }
+
+    public static void generateFromProjectNode(Node node)
+    {
+      String diagram = ((Element)node).getAttribute("diagram");
+      String baseClass = ((Element)node).getAttribute("baseClass");
+      String virtual = ((Element)node).getAttribute("makeVirtual");
+      boolean makeVirtual = CodeGenerator.makeVirtual;
+      if(virtual != null && !virtual.equals(""))
+      {
+        if(virtual.equalsIgnoreCase("true"))
+        {
+          makeVirtual = true;
+        }
+        else if(virtual.equalsIgnoreCase("false"))
+        {
+          makeVirtual = false;
+        }
+        else
+        {
+          System.err.println("validation error. makeVirtual not set to true or false. was set to: " + virtual);
+          System.exit(1);
+        }
+      }
+      String derivedString = ((Element)node).getAttribute("derived");
+      boolean derived = CodeGenerator.derived;
+      if(derivedString != null && !derivedString.equals(""))
+      {
+        if(derivedString.equalsIgnoreCase("true"))
+        {
+          derived = true;
+        }
+        else if(derivedString.equalsIgnoreCase("false"))
+        {
+          derived = false;
+        }
+        else
+        {
+          System.err.println("validation error. derived not set to true or false. was set to: " + derivedString);
+          System.exit(1);
+        }
+      }
+      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
+      {
+        return;
+      }
+      generateCPPFiles(diagram, baseClass, "", makeVirtual, derived);
     }
 
     public static void main(String[] args)
@@ -378,8 +508,14 @@ public class CodeGenerator extends AZGenericMachineGenerator
                 fileTypes.add(args[i + 1]);
                 i++;
             }
-            else if (args[i].equals("--output-automaton")) {
+            else if (args[i].equals("--output-automaton"))
+            {
                 outputAutomaton = true;
+            }
+            else if (args[i].equals("--generate-from-project"))
+            {
+              projectFile = args[i + 1];
+              i++;
             }
             else
             {
@@ -421,6 +557,12 @@ public class CodeGenerator extends AZGenericMachineGenerator
             String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
             writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
 
+            System.exit(0);
+        }
+
+        if(projectFile != null)
+        {
+            generateFromProject(projectFile);
             System.exit(0);
         }
         
