@@ -1,10 +1,7 @@
-
-function Entry (hash, key, value, next)
+function Entry(key, value)
 {
-  this.hash = hash;
   this.key = key;
   this.value = value;
-  this.next = next;
 }
  
 Entry.prototype.getKey = function() {
@@ -21,24 +18,78 @@ Entry.prototype.setValue = function(value) {
   return oldValue;
 };
 
-var entry = new Entry(1, 2, "test", 4);
-print(entry.hash);
-print(entry.key);
-print(entry.getKey());
-print(entry.value);
-print(entry.getValue());
-print(entry.next);
-print(entry.setValue(5));
-print(entry.getValue());
-
-function MyEntry (hash, key, value, next)
+function HashTable(capacity, loadFactor)
 {
-  this.hash = hash;
-  this.key = key;
-  this.value = value;
-  this.next = next;
+  this.capacity = capacity
+  this.loadFactor = loadFactor;
+  this.table = [];
+  this.size = 0;
+  if(this.capacity == 0)
+  {
+    this.capacity = 1;
+  }
+  // Populate the array with empty arrays
+  for(var i = 0; i < capacity; i++)
+  {
+    this.table.push([]);
+  }
+};
+
+HashTable.prototype.getSize = function() {
+  return this.size;
+};
+
+HashTable.prototype.isEmpty = function() {
+  return size == 0;
+};
+
+HashTable.prototype.put = function(key, value)
+{
+  var index = (key & 0x7FFFFFFF) % this.capacity;
+  var entryArray = this.table[index];
+  for(var i = 0; i < entryArray.length; i++)
+  {
+    if(entryArray[i].length == 0)
+    {
+      break;
+    }
+    if(entryArray[i].key == key)
+    {
+      var old = entryArray[i].value;
+      entryArray[i].value = value;
+      return old;
+    }
+  }
+  // If we are here then there was no existing entry in the table
+  // Should check if re-hashing is required, but aren't.
+  this.table[index].push(new Entry(key, value));
+  this.size++;
+  return undefined;
 }
 
-var myEntry = Object.create(new Entry(6, 7, "test2", 8));
+HashTable.prototype.get = function(key)
+{
+  var index = (key & 0x7FFFFFFF) % this.capacity;
+  var entryArray = this.table[index];
+  for(var i = 0; i < entryArray.length; i++)
+  {
+    if(entryArray[i].key == key)
+    {
+      return entryArray[i].value;
+    }
+  }
+  return undefined;
+};
 
-print(myEntry.getKey());
+var hashTable = new HashTable(1, 2);
+print(hashTable.put(1, 2));
+print(hashTable.put(1, 3));
+print(hashTable.put(2, 5));
+
+print('get test');
+print(hashTable.get(1));
+print(hashTable.get(2));
+
+
+
+
