@@ -91,7 +91,12 @@ class HashTable
         return entryArray[i].value;
       }
     }
-    return undefined;
+    return errorValue;
+  }
+
+  setErrorValue(errorValue)
+  {
+    this.errorValue = errorValue;
   }
 }
 
@@ -123,6 +128,53 @@ class StateMachine
     key |= input;
     this.hashTable.put(key, newState);
   }
+
+  setErrorValue(errorValue)
+  {
+    this.hashTable.setErrorValue(errorValue);
+  }
+}
+
+
+/*
+ Begin definition of the state transition class 
+*/
+class TransitionInfo
+{
+  constructor(transitionMethod, stateMethod, stateIndex)
+  {
+    this.transitionMethod = transitionMethod;
+    this.stateMethod = stateMethod;
+    this.stateIndex = stateIndex;
+  }
+}
+
+
+/*
+ Begin definition of the Automaton class 
+*/
+class Automaton
+{
+  constructor()
+  {
+    var errorValue = new TransitionInfo();
+    errorValue.stateIndex = -1;
+    this.stateMachine = new StateMachine();
+    this.stateMachine.setErrorValue(errorValue);
+  }
+
+  executeCurrentState()
+  {
+    this.currentInfo.stateMethod();
+  }
+
+  processInput(input)
+  {
+    var newStateInfo = this.stateMachine.getNextState(0, this.currentInfo.stateIndex, input);
+    this.previousInfo = this.currentInfo;
+    this.currentInfo = newStateInfo;
+    this.currentInfo.transitionMethod();
+  }
 }
 
 var hashTable = new HashTable(1, 2);
@@ -144,5 +196,5 @@ stateMachine.insertTransition(1, 0, 1);
 stateMachine.insertTransition(1, 1, 0);
 stateMachine.insertTransition(1, 1, 1);
 
-
+var automaton = new Automaton();
 
