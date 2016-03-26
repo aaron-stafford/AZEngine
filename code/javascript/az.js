@@ -262,7 +262,7 @@ class SplashScreen extends Automaton
 
   AZ_FADE_IN_ON_FadeInComplete()
   {
-    print("AZ_FADE_IN_ON_FadeInoComplete");
+    print("AZ_FADE_IN_ON_FadeInComplete");
   }
 
   AZ_FADE_OUT_ON_FadeOutComplete()
