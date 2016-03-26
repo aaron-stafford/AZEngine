@@ -141,12 +141,14 @@ class StateMachine
 */
 class TransitionInfo
 {
+/*
   constructor(transitionMethod, stateMethod, stateIndex)
   {
     this.transitionMethod = transitionMethod;
     this.stateMethod = stateMethod;
     this.stateIndex = stateIndex;
   }
+*/
 }
 
 
@@ -161,6 +163,10 @@ class Automaton
     errorValue.stateIndex = -1;
     this.stateMachine = new StateMachine();
     this.stateMachine.setErrorValue(errorValue);
+  }
+
+  initAutomaton()
+  {
   }
 
   executeCurrentState()
@@ -201,5 +207,129 @@ stateMachine.insertTransition(1, 0, 1);
 stateMachine.insertTransition(1, 1, 0);
 stateMachine.insertTransition(1, 1, 1);
 
-var automaton = new Automaton();
+//var automaton = new Automaton();
 
+class SplashScreen extends Automaton
+{
+  constructor()
+  {
+    super();
+    // State indexes
+    this.FADE_IN = 2;
+    this.FADE_OUT = 3;
+    this.FINISHED = 5;
+    this.IDLE = 4;
+    this.START_STATE = 1;
+
+    // Input indexes
+    this.FadeInComplete = 2;
+    this.FadeOutComplete = 3;
+    this.StartFadeIn = 1;
+    this.StartFadeOut = 4;
+  }
+
+  // State methods
+  AZ_FADE_IN()
+  {
+    print("AZ_FADE_IN");
+  }
+
+  AZ_FADE_OUT()
+  {
+    print("AZ_FADE_OUT");
+  }
+
+  AZ_FINISHED()
+  {
+    print("AZ_FINISHED");
+  }
+
+  AZ_IDLE()
+  {
+    print("AZ_IDLE");
+  }
+
+  AZ_START_STATE()
+  {
+    print("AZ_START_STATE");
+  }
+
+  // Transition methods
+  AZ_START_STATE_ON_StartFadeIn()
+  {
+    print("AZ_START_STATE_ON_StartFadeIn");
+  }
+
+  AZ_FADE_IN_ON_FadeInComplete()
+  {
+    print("AZ_FADE_IN_ON_FadeInoComplete");
+  }
+
+  AZ_FADE_OUT_ON_FadeOutComplete()
+  {
+    print("AZ_FADE_OUT_ON_FadeOutComplete");
+  }
+
+  AZ_IDLE_ON_StartFadeOut()
+  {
+    print("AZ_IDLE_ON_StartFadeOut");
+  }
+
+  initAutomaton()
+  {
+    {
+      var info = new TransitionInfo();
+      info.transitionMethod = this.AZ_START_STATE_ON_StartFadeIn;
+      info.stateMethod = this.AZ_FADE_IN;
+      info.stateIndex = this.FADE_IN;
+      this.stateMachine.insertTransition(0, this.START_STATE, this.StartFadeIn, info);
+    }
+
+    {
+      var info = new TransitionInfo();
+      info.transitionMethod = this.AZ_FADE_IN_ON_FadeInComplete;
+      info.stateMethod = this.AZ_IDLE;
+      info.stateIndex = this.IDLE;
+      this.stateMachine.insertTransition(0, this.FADE_IN, this.FadeInComplete, info);
+    }
+    
+    {
+      var info = new TransitionInfo();
+      info.transitionMethod = this.AZ_FADE_OUT_ON_FadeOutComplete;
+      info.stateMethod = this.AZ_FINISHED;
+      info.stateIndex = this.FINISHED;
+      this.stateMachine.insertTransition(0, this.FADE_OUT, this.FadeOutComplete, info);
+    }
+
+    {
+      var info = new TransitionInfo();
+      info.transitionMethod = this.AZ_IDLE_ON_StartFadeOut;
+      info.stateMethod = this.AZ_FADE_OUT;
+      info.stateIndex = this.FADE_OUT;
+      this.stateMachine.insertTransition(0, this.IDLE, this.StartFadeOut, info);
+    }
+
+    {
+      var info = new TransitionInfo();
+      info.transitionMethod = undefined;
+      info.stateMethod = this.AZ_START_STATE;
+      info.stateIndex = this.START_STATE;
+      this.currentInfo = info;
+      this.previousInfo = info;
+      this.setInitialStateInfo(info);
+    }
+  }
+}
+
+
+var splashScreen = new SplashScreen();
+splashScreen.initAutomaton();
+splashScreen.executeCurrentState();
+splashScreen.processInput(splashScreen.StartFadeIn);
+splashScreen.executeCurrentState();
+splashScreen.processInput(splashScreen.FadeInComplete);
+splashScreen.executeCurrentState();
+splashScreen.processInput(splashScreen.StartFadeOut);
+splashScreen.executeCurrentState();
+splashScreen.processInput(splashScreen.FadeOutComplete);
+splashScreen.executeCurrentState();
