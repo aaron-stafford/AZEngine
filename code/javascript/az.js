@@ -25,10 +25,9 @@ Entry.prototype.setValue = function(value) {
 /*
  Begin definition of the HashTable class
 */
-function HashTable(capacity, loadFactor)
+function HashTable(capacity)
 {
   this.capacity = capacity
-  this.loadFactor = loadFactor;
   this.table = [];
   this.size = 0;
   if(this.capacity == 0)
@@ -88,8 +87,29 @@ HashTable.prototype.get = function(key)
 /*
  Begin definition of the State Machine class 
 */
+function StateMachine()
+{
+  var capacity = 11;
+  this.hashTable = new HashTable(capacity);
+};
 
+StateMachine.prototype.getNextState = function(objectID, currentState, input)
+{
+  var key = objectID << 20;
+  key |= currentState << 10;
+  key |= input;
+  var nextState = this.hashTable.get(key);
+  return nextState;
+};
 
+StateMachine.prototype.insertTransition = function(objectID, currentState, input, newState)
+{
+  var key = objectID << 20;
+  key |= currentState << 10;
+  key |= input;
+  this.hashTable.put(key, newState);
+print("key value on insert = " + key);
+};
 
 var hashTable = new HashTable(1, 2);
 print(hashTable.put(1, 2));
@@ -100,6 +120,15 @@ print('get test');
 print(hashTable.get(1));
 print(hashTable.get(2));
 
+var stateMachine = new StateMachine();
+stateMachine.insertTransition(0, 0, 1);
+stateMachine.insertTransition(0, 0, 2);
+stateMachine.insertTransition(0, 1, 0);
+stateMachine.insertTransition(0, 1, 1);
+stateMachine.insertTransition(1, 0, 0);
+stateMachine.insertTransition(1, 0, 1);
+stateMachine.insertTransition(1, 1, 0);
+stateMachine.insertTransition(1, 1, 1);
 
 
 
