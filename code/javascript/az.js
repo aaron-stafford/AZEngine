@@ -1,3 +1,6 @@
+/*
+ Begin definition of the hash table Entry class
+*/
 function Entry(key, value)
 {
   this.key = key;
@@ -18,6 +21,10 @@ Entry.prototype.setValue = function(value) {
   return oldValue;
 };
 
+
+/*
+ Begin definition of the HashTable class
+*/
 function HashTable(capacity, loadFactor)
 {
   this.capacity = capacity
@@ -49,10 +56,6 @@ HashTable.prototype.put = function(key, value)
   var entryArray = this.table[index];
   for(var i = 0; i < entryArray.length; i++)
   {
-    if(entryArray[i].length == 0)
-    {
-      break;
-    }
     if(entryArray[i].key == key)
     {
       var old = entryArray[i].value;
@@ -80,6 +83,13 @@ HashTable.prototype.get = function(key)
   }
   return undefined;
 };
+
+
+/*
+ Begin definition of the State Machine class 
+*/
+
+
 
 var hashTable = new HashTable(1, 2);
 print(hashTable.put(1, 2));
