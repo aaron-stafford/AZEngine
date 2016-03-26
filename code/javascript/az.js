@@ -175,6 +175,11 @@ class Automaton
     this.currentInfo = newStateInfo;
     this.currentInfo.transitionMethod();
   }
+
+  setInitialStateInfo(initialStateInfo)
+  {
+    this.initialStateInfo = initialStateInfo;
+  }
 }
 
 var hashTable = new HashTable(1, 2);
