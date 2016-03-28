@@ -89,3 +89,9 @@ Command line args
   Specifies the path to write output files to. For example, if used with 
   --output-automaton, the automaton files will be written to the directory 
   specified by output_path. output_path must exist.
+
+--language language
+
+  Specifies the language for which to output the automaton code. Presently, the
+  only supported languages are javascript and C++. If no language is specified,
+  output defaults to C++.
