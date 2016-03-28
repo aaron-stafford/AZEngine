@@ -34,26 +34,16 @@ public class CodeGenerator
 {
     static String CLASS_NAME_PREFIX = "AZ";
     static String TEMPLATE_NAME = null;
-    static String TEMPLATE_H = "h.template";
-    static String TEMPLATE_CPP = "cpp.template";
-    static String TEMPLATE_DERIVED_H = "h.derived.template";
-    static String TEMPLATE_DERIVED_CPP = "cpp.derived.template";
     static String OUTPUT_PATH = "";
     static String STATE_DIAGRAM = null;
     static ArrayList<String> fileTypes = new ArrayList<String>();
     static String projectFile;
     static String language = null;
+    static AZGenericMachineGenerator generator = null;
 
     // Overwrite existing implementation files?
     static boolean forceOverwrite = false;
 
-    // Derived from Automaton? Or Automaton built in?
-    // Preference is for the class to be derived from an Automaton.
-    // Probably should be default, other case is not-derived.
-    static boolean derived = true;
-
-    static boolean makeVirtual = false;
-    
     static boolean outputAutomaton = false;
     
     private static String getPackageFileAsString(String filename)
@@ -100,231 +90,16 @@ public class CodeGenerator
         return content;
     }
 
-    // TODO: Implement the method that takes all parameters.
-    public static String generate(String diagram, String template, String className, boolean makeVirtual)
-    {
-        // TODO: Check if the class has already been created. Only create it if it
-        // hasn't been.
-        CPPGenerator jenny = new CPPGenerator();
-        CPPGenerator.inputFile = diagram;
-        CPPGenerator.CLASS_NAME = className;
-        jenny.init();
-        BufferedReader in = null;
-
-        try
-        {
-            if (in == null)
-            {
-                InputStream is = CodeGenerator.class.getResourceAsStream("/az/"
-                        + template);
-                in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            }
-
-            StringBuffer output = jenny.genFile(in, makeVirtual);
-
-            in.close();
-
-            return output.toString();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        return null;
-    }
-    
-    public static String generateDefault(String diagram, String template, String className)
-    {
-        return generate(diagram, template, className, makeVirtual);
-    }
-
-    public static String generateCPP(String diagram, String className, boolean makeVirtual, boolean derived)
-    {
-        if(derived)
-        {
-          return generate(diagram, TEMPLATE_DERIVED_CPP, className, makeVirtual);
-        }
-        else
-        {
-          return generate(diagram, TEMPLATE_CPP, className, makeVirtual);
-        }
-    }
-
-    public static String generateDefaultCPP(String diagram, String className)
-    {
-        return generateDefault(diagram, TEMPLATE_CPP, className);
-    }
-
-    public static String generateH(String diagram, String className, boolean makeVirtual, boolean derived)
-    {
-        if(derived)
-        {
-          return generate(diagram, TEMPLATE_DERIVED_H, className, makeVirtual);
-        }
-        else
-        {
-          return generate(diagram, TEMPLATE_H, className, makeVirtual);
-        }
-    }
-
-    public static String generateDefaultH(String diagram, String className)
-    {
-        return generateDefault(diagram, TEMPLATE_H, className);
-    }
-    
-    public static void generateCPPFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived)
-    {
-        String fileBaseName = outputPath;
-        if(fileBaseName == null)
-        {
-            fileBaseName = "";
-        }
-        if(!fileBaseName.equals("") && !fileBaseName.endsWith(File.separator))
-        {
-            fileBaseName += File.separator;
-        }
-        String cppCode = generateCPP(diagram, className, makeVirtual, derived);
-        writeToFile(cppCode, fileBaseName + className + ".cpp");
-        String hCode = generateH(diagram, className, makeVirtual, derived);
-        writeToFile(hCode, fileBaseName + className + ".h");
-    }
-
-    public static void generateDefaultCPPFiles(String diagram, String className, String outputPath)
-    {
-        String cppCode = generateDefaultCPP(diagram, className);
-        writeToFile(cppCode, className + ".cpp");
-        String hCode = generateDefaultH(diagram, className);
-        writeToFile(hCode, className + ".h");
-    }
-    
-    public static void writeToFile(String code, String filename)
-    {
-        try
-        {
-            PrintWriter out = new PrintWriter(filename);
-            out.println(code.toString());
-            out.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    public static void generateFromProject(String projectFile)
-    {
-      try
-      {
-        File file = new File(projectFile);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(file);
-        generateFromProject(document);
-      }
-      catch(Exception e)
-      {
-        e.printStackTrace();
-        System.exit(1);
-      }
-    }
-
-    public static void generateFromProject(Document projectDocument)
-    {
-      if (projectDocument == null)
-      {
-        System.err.println("Invalid projectDocument");
-        System.exit(1);
-      }
-      recursivelyGenerateFromNode((Node)projectDocument);
-    }
-
-    public static void recursivelyGenerateFromNode(Node node)
-    {
-      if(node.getNodeName().equals("automaton"))
-      {
-        generateFromProjectNode(node);
-        // Need to be recursive at this point.
-      }
-      NodeList list = node.getChildNodes();
- 
-      for (int i = 0 ; i < list.getLength() ; i++)
-      {
-        Node innerNode = list.item(i);
-        if (innerNode.getNodeType() == Node.ELEMENT_NODE)
-        {
-          recursivelyGenerateFromNode(innerNode);
-        }
-      }
-    }
-
-    public static void generateFromProjectNode(Node node)
-    {
-      String diagram = ((Element)node).getAttribute("diagram");
-      String baseClass = ((Element)node).getAttribute("baseClass");
-      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
-      {
-        return;
-      }
-      String virtual = ((Element)node).getAttribute("makeVirtual");
-      boolean makeVirtual = CodeGenerator.makeVirtual;
-      if(virtual != null && !virtual.equals(""))
-      {
-        if(virtual.equalsIgnoreCase("true"))
-        {
-          makeVirtual = true;
-        }
-        else if(virtual.equalsIgnoreCase("false"))
-        {
-          makeVirtual = false;
-        }
-        else
-        {
-          System.err.println("validation error. makeVirtual not set to true or false. was set to: " + virtual);
-          System.exit(1);
-        }
-      }
-      String derivedString = ((Element)node).getAttribute("derived");
-      boolean derived = CodeGenerator.derived;
-      if(derivedString != null && !derivedString.equals(""))
-      {
-        if(derivedString.equalsIgnoreCase("true"))
-        {
-          derived = true;
-        }
-        else if(derivedString.equalsIgnoreCase("false"))
-        {
-          derived = false;
-        }
-        else
-        {
-          System.err.println("validation error. derived not set to true or false. was set to: " + derivedString);
-          System.exit(1);
-        }
-      }
-      String outputPath = ((Element)node).getAttribute("outputPath");
-      if(outputPath == null)
-      {
-        outputPath = "";
-      }
-      generateCPPFiles(diagram, baseClass, outputPath, makeVirtual, derived);
-    }
-
     public static void main(String[] args)
     {
         processArgs(args);
 
-        CPPGenerator jenny = new CPPGenerator();
-        CPPGenerator.inputFile = STATE_DIAGRAM;
-        jenny.init();
-
+/*
         for (String fileType : fileTypes)
         {
             try
             {
-                String outputFile = OUTPUT_PATH + CPPGenerator.CLASS_NAME + fileType;
+                String outputFile = OUTPUT_PATH + AZGenericMachineGenerator.CLASS_NAME + fileType;
                 File f = new File(outputFile);
 
                 if (f.exists() && !f.isDirectory())
@@ -353,7 +128,7 @@ public class CodeGenerator
             String templateName = TEMPLATE_NAME;
             if (fileType.equals(".h"))
             {
-                String outputFile = OUTPUT_PATH + CPPGenerator.CLASS_NAME + ".h";
+                String outputFile = OUTPUT_PATH + AZGenericMachineGenerator.CLASS_NAME + ".h";
 
                 String template = null;
 
@@ -398,7 +173,7 @@ public class CodeGenerator
 
                 System.err.println("Converting template: " + templateName
                         + " into: " + outputFile);
-                StringBuffer output = jenny.genFile(template, makeVirtual);
+                StringBuffer output = generator.genFile(template, makeVirtual);
 
                 if (output != null)
                 {
@@ -407,7 +182,7 @@ public class CodeGenerator
             }
             else if (fileType.equals(".cpp"))
             {
-                String outputFile = OUTPUT_PATH + CPPGenerator.CLASS_NAME + ".cpp";
+                String outputFile = OUTPUT_PATH + AZGenericMachineGenerator.CLASS_NAME + ".cpp";
 
                 String template = null;
 
@@ -441,7 +216,7 @@ public class CodeGenerator
                 System.out.println("Converting template: " + templateName
                         + " into: " + outputFile);
 
-                StringBuffer output = jenny.genFile(template, makeVirtual);
+                StringBuffer output = generator.genFile(template, makeVirtual);
 
                 if (output != null)
                 {
@@ -459,6 +234,7 @@ public class CodeGenerator
                 System.exit(1);
             }
         }
+*/
     }
 
     private static void processArgs(String[] args)
@@ -493,7 +269,7 @@ public class CodeGenerator
             }
             else if (args[i].equals("--class-name"))
             {
-                CPPGenerator.CLASS_NAME = args[i + 1];
+                AZGenericMachineGenerator.CLASS_NAME = args[i + 1];
                 i++;
             }
             else if (args[i].equals("--class-name-prefix"))
@@ -511,11 +287,11 @@ public class CodeGenerator
             }
             else if (args[i].equals("--not-derived"))
             {
-                derived = false;
+                AZGenericMachineGenerator.derived = false;
             }
             else if (args[i].equals("--make-virtual"))
             {
-                makeVirtual = true;
+                AZGenericMachineGenerator.makeVirtual = true;
             }
             else if (args[i].equals("--file-type"))
             {
@@ -537,7 +313,7 @@ public class CodeGenerator
                 i++;
                 if(!language.equals("javascript") && !language.equalsIgnoreCase("c++"))
                 {
-                    System.err.println("Lanauage: " + language + " is not supported");
+                    System.err.println("Language: " + language + " is not supported");
                     System.err.println("Only javascript and c++ are supported");
                     System.exit(1);
                 }
@@ -548,57 +324,73 @@ public class CodeGenerator
                 System.exit(1);
             }
         }
-        
+
         // Output the automaton code too
         if (outputAutomaton)
         {
             if(language == null || language.equalsIgnoreCase("c++"))
             {
                 String azCPP = getPackageFileAsString("AZ.cpp");
-                writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
+                AZGenericMachineGenerator.writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
  
                 String azH = getPackageFileAsString("AZ.h");
-                writeToFile(azH, OUTPUT_PATH + "AZ.h");
+                AZGenericMachineGenerator.writeToFile(azH, OUTPUT_PATH + "AZ.h");
  
                 String azHPP = getPackageFileAsString("AZ.t.hpp");
-                writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
+                AZGenericMachineGenerator.writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
  
-                if (derived)
+                if (AZGenericMachineGenerator.derived)
                 {
                     String automatonCPP = getPackageFileAsString("Automaton.cpp");
-                    writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
+                    AZGenericMachineGenerator.writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
  
                     String automatonH = getPackageFileAsString("Automaton.h");
-                    writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
+                    AZGenericMachineGenerator.writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
                 }
  
                 String tcpClientCPP = getPackageFileAsString("TCPClient.cpp");
-                writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
+                AZGenericMachineGenerator.writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
  
                 String tcpClientH = getPackageFileAsString("TCPClient.h");
-                writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
+                AZGenericMachineGenerator.writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
  
                 String stateDebuggerCPP = getPackageFileAsString("StateDebugger.cpp");
-                writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
+                AZGenericMachineGenerator.writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
  
                 String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
-                writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
+                AZGenericMachineGenerator.writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
             }
             else if(language.equalsIgnoreCase("javascript"))
             {
                 String azJS = getPackageFileAsString("javascript/az.js");
-                writeToFile(azJS, OUTPUT_PATH + "az.js");
+                AZGenericMachineGenerator.writeToFile(azJS, OUTPUT_PATH + "az.js");
             }
             System.exit(0);
         }
 
+        if(language == null || language.equalsIgnoreCase("c++"))
+        {
+          generator = new CPPGenerator();
+        }
+        else if(language.equalsIgnoreCase("javascript"))
+        {
+          generator = new JavascriptGenerator();
+        }
+        else
+        {
+          System.err.println("No generator defined for language: " + language);
+        }
+
+        //AZGenericMachineGenerator.inputFile = STATE_DIAGRAM;
+        //generator.init();
+
         if(projectFile != null)
         {
-            generateFromProject(projectFile);
+            generator.generateFromProject(projectFile);
             System.exit(0);
         }
         
-        if (CPPGenerator.CLASS_NAME == null)
+        if (AZGenericMachineGenerator.CLASS_NAME == null)
         {
             System.err.println("No class name specified.");
             System.err.println("Specify one with --class-name");
@@ -617,7 +409,7 @@ public class CodeGenerator
             System.exit(1);
         }
 
-        if (TEMPLATE_NAME != null && !derived)
+        if (TEMPLATE_NAME != null && !AZGenericMachineGenerator.derived)
         {
             System.err.println("Warning: --not-derived has no effect when using a custom template");
         }
@@ -628,6 +420,6 @@ public class CodeGenerator
             System.exit(1);
         }
 
-        CPPGenerator.CLASS_NAME = CLASS_NAME_PREFIX + CPPGenerator.CLASS_NAME;
+        AZGenericMachineGenerator.CLASS_NAME = CLASS_NAME_PREFIX + AZGenericMachineGenerator.CLASS_NAME;
     }
 }

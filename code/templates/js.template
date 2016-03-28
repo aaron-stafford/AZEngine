@@ -1,0 +1,34 @@
+// ${PREAMBLE_START}
+// ${PREAMBLE_END}
+
+class ${CLASS_NAME} extends Automaton
+{
+  constructor()
+  {
+    super();
+    // State index
+    // ${STATE_INDEXES_START}
+    // ${STATE_INDEXES_END}
+ 
+    // Input index
+    // ${INPUT_INDEXES_START}
+    // ${INPUT_INDEXES_END}
+  }
+
+  // State methods
+  ${STATE_METHODS_DEFINITIONS}
+
+  // Transition methods
+  ${TRANSITION_METHODS_DEFINITIONS}
+
+  initAutomaton()
+  {
+    // Populate hashtable
+    // ${TABLE_INSERTIONS_START}
+    // ${TABLE_INSERTIONS_END}
+
+    // Set initial state
+    // ${INITIAL_STATE_START}
+    // ${INITIAL_STATE_END}
+  }
+}

@@ -19,12 +19,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class CPPGenerator extends AZGenericMachineGenerator
+public class JavascriptGenerator extends AZGenericMachineGenerator
 {
-    static String TEMPLATE_H = "h.template";
-    static String TEMPLATE_CPP = "cpp.template";
-    static String TEMPLATE_DERIVED_H = "h.derived.template";
-    static String TEMPLATE_DERIVED_CPP = "cpp.derived.template";
+    static String TEMPLATE_JS = "js.template";
 
     public StringBuffer genFile(BufferedReader templateReader,
             boolean makeVirtual)
@@ -86,7 +83,7 @@ public class CPPGenerator extends AZGenericMachineGenerator
                         output.append(s + "\n");
                         for (String stateName : orderedSet)
                         {
-                            output.append("  static const int " + stateName + " = "
+                            output.append("    this." + stateName + " = "
                                     + stateIndex.get(stateName) + ";\n");
                         }
 
@@ -116,7 +113,7 @@ public class CPPGenerator extends AZGenericMachineGenerator
                         output.append(s + "\n");
                         for (String eventName : orderedEventSet)
                         {
-                            output.append("  static const int " + eventName + " = "
+                            output.append("    this." + eventName + " = "
                                     + eventIndex.get(eventName) + ";\n");
                         }
 
@@ -179,8 +176,7 @@ public class CPPGenerator extends AZGenericMachineGenerator
                     {
                         for (Transition transition : transitions)
                         {
-                            output.append("void " + CLASS_NAME + "::"
-                                   + STATE_METHOD_PREFIX 
+                            output.append("  " + STATE_METHOD_PREFIX 
                                    + transition.startStateId + "_ON_" 
                                    + transition.eventId + "() {}\n");
                         }
@@ -232,8 +228,7 @@ public class CPPGenerator extends AZGenericMachineGenerator
 
                         for (String stateName : orderedSet)
                         {
-                            output.append("void " + CLASS_NAME + "::"
-                                    + STATE_METHOD_PREFIX + stateName + "()");
+                            output.append("  " + STATE_METHOD_PREFIX + stateName + "()");
                             String code = codeBlocks.get(stateName);
                             if (code != null)
                             {
@@ -251,24 +246,24 @@ public class CPPGenerator extends AZGenericMachineGenerator
                     {
                         output.append(s + "\n");
 
-                        output.append("  transition_info_t info;\n");
                         for (Transition transition : transitions)
                         {
-                            output.append("  info.transitionMethod = (MethodIndex)&" + CLASS_NAME + "::"
-                                   + STATE_METHOD_PREFIX 
+                            output.append("    {\n");
+                            output.append("      var info = new TransitionInfo();\n");
+                            output.append("      info.transitionMethod = this." + STATE_METHOD_PREFIX 
                                    + transition.startStateId + "_ON_" 
                                    + transition.eventId + ";\n");
 
-                            output.append("  info.stateMethod = (MethodIndex)&" + CLASS_NAME + "::"
-                                   + STATE_METHOD_PREFIX 
+                            output.append("      info.stateMethod = this." + STATE_METHOD_PREFIX 
                                    + transition.endStateId + ";\n");
 
-                            output.append("  info.stateIndex = "
+                            output.append("      info.stateIndex = this."
                                    + transition.endStateId + ";\n");
 
-                            output.append("  stateMachine.InsertTransition(0, "
-                                   + transition.startStateId + ", "
-                                   + transition.eventId + ", info);\n\n");
+                            output.append("      this.stateMachine.insertTransition(0, this."
+                                   + transition.startStateId + ", this."
+                                   + transition.eventId + ", info);\n");
+                            output.append("    }\n");
                         }
 
                         while (templateReader.ready())
@@ -324,16 +319,19 @@ public class CPPGenerator extends AZGenericMachineGenerator
                     else if (key.equals("INITIAL_STATE_START"))
                     {
                         output.append(s + "\n");
-                        output.append("  info.transitionMethod = 0;\n");
-                        output.append("  info.stateMethod = (MethodIndex)&" + CLASS_NAME + "::"
+                        output.append("    {\n");
+                        output.append("      var info = new TransitionInfo();\n");
+                        output.append("      info.transitionMethod = undefined;\n");
+                        output.append("      info.stateMethod = this."
                                + STATE_METHOD_PREFIX 
                                + initialState + ";\n");
 
-                        output.append("  info.stateIndex = " + initialState + ";\n");
+                        output.append("      info.stateIndex = this." + initialState + ";\n");
 
-                        output.append("  m_CurrentInfo = info;\n");
-                        output.append("  m_PreviousInfo = info;\n");
-                        output.append("  SetInitialInfo(info);\n");
+                        output.append("      this.currentInfo = info;\n");
+                        output.append("      this.previousInfo = info;\n");
+                        output.append("      this.setInitialStateInfo(info);\n");
+                        output.append("    }\n");
 
                         while (templateReader.ready())
                         {
@@ -534,45 +532,6 @@ public class CPPGenerator extends AZGenericMachineGenerator
         return null;
     }
 
-    public String generateDefault(String diagram, String template, String className)
-    {
-        return generate(diagram, template, className, makeVirtual);
-    }
-
-    public String generateCPP(String diagram, String className, boolean makeVirtual, boolean derived)
-    {
-        if(derived)
-        {
-          return generate(diagram, TEMPLATE_DERIVED_CPP, className, makeVirtual);
-        }
-        else
-        {
-          return generate(diagram, TEMPLATE_CPP, className, makeVirtual);
-        }
-    }
-
-    public String generateDefaultCPP(String diagram, String className)
-    {
-        return generateDefault(diagram, TEMPLATE_CPP, className);
-    }
-
-    public String generateH(String diagram, String className, boolean makeVirtual, boolean derived)
-    {
-        if(derived)
-        {
-          return generate(diagram, TEMPLATE_DERIVED_H, className, makeVirtual);
-        }
-        else
-        {
-          return generate(diagram, TEMPLATE_H, className, makeVirtual);
-        }
-    }
-
-    public String generateDefaultH(String diagram, String className)
-    {
-        return generateDefault(diagram, TEMPLATE_H, className);
-    }
-    
     public void generateFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived)
     {
         String fileBaseName = outputPath;
@@ -584,17 +543,19 @@ public class CPPGenerator extends AZGenericMachineGenerator
         {
             fileBaseName += File.separator;
         }
-        String cppCode = generateCPP(diagram, className, makeVirtual, derived);
-        writeToFile(cppCode, fileBaseName + className + ".cpp");
-        String hCode = generateH(diagram, className, makeVirtual, derived);
-        writeToFile(hCode, fileBaseName + className + ".h");
+        String code = generateJavascript(diagram, className, makeVirtual, derived);
+        writeToFile(code, fileBaseName + className + ".js");
     }
 
-    public void generateDefaultCPPFiles(String diagram, String className, String outputPath)
+    public String generateJavascript(String diagram, String className, boolean makeVirtual, boolean derived)
     {
-        String cppCode = generateDefaultCPP(diagram, className);
-        writeToFile(cppCode, className + ".cpp");
-        String hCode = generateDefaultH(diagram, className);
-        writeToFile(hCode, className + ".h");
+        if(derived)
+        {
+          return generate(diagram, TEMPLATE_JS, className, makeVirtual);
+        }
+        else
+        {
+          return generate(diagram, TEMPLATE_JS, className, makeVirtual);
+        }
     }
 }

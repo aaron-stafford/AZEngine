@@ -2,6 +2,9 @@ package az;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -45,7 +48,11 @@ public abstract class AZGenericMachineGenerator
     static String STATE_METHOD_PREFIX = "AZ_";
     static ArrayList<String> codeTransitions = new ArrayList<String>();
     static String initialState = null;
-
+    static boolean makeVirtual = false;
+    // Derived from Automaton? Or Automaton built in?
+    // Preference is for the class to be derived from an Automaton.
+    // Probably should be default, other case is not-derived.
+    static boolean derived = true;
 
     public void init()
     {
@@ -366,5 +373,151 @@ public abstract class AZGenericMachineGenerator
     {
         BufferedReader reader = new BufferedReader(new StringReader(template));
         return genFile(reader, makeVirtual);
+    }
+
+    public void generateFromProject(String projectFile)
+    {
+      try
+      {
+        File file = new File(projectFile);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(file);
+        generateFromProject(document);
+      }
+      catch(Exception e)
+      {
+        e.printStackTrace();
+        System.exit(1);
+      }
+    }
+
+    public void generateFromProject(Document projectDocument)
+    {
+      if (projectDocument == null)
+      {
+        System.err.println("Invalid projectDocument");
+        System.exit(1);
+      }
+      recursivelyGenerateFromNode((Node)projectDocument);
+    }
+
+    public void recursivelyGenerateFromNode(Node node)
+    {
+      if(node.getNodeName().equals("automaton"))
+      {
+        generateFromProjectNode(node);
+        // Need to be recursive at this point.
+      }
+      NodeList list = node.getChildNodes();
+ 
+      for (int i = 0 ; i < list.getLength() ; i++)
+      {
+        Node innerNode = list.item(i);
+        if (innerNode.getNodeType() == Node.ELEMENT_NODE)
+        {
+          recursivelyGenerateFromNode(innerNode);
+        }
+      }
+    }
+
+    public void generateFromProjectNode(Node node)
+    {
+      String diagram = ((Element)node).getAttribute("diagram");
+      String baseClass = ((Element)node).getAttribute("baseClass");
+      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
+      {
+        return;
+      }
+      String virtual = ((Element)node).getAttribute("makeVirtual");
+      boolean makeVirtual = AZGenericMachineGenerator.makeVirtual;
+      if(virtual != null && !virtual.equals(""))
+      {
+        if(virtual.equalsIgnoreCase("true"))
+        {
+          makeVirtual = true;
+        }
+        else if(virtual.equalsIgnoreCase("false"))
+        {
+          makeVirtual = false;
+        }
+        else
+        {
+          System.err.println("validation error. makeVirtual not set to true or false. was set to: " + virtual);
+          System.exit(1);
+        }
+      }
+      String derivedString = ((Element)node).getAttribute("derived");
+      boolean derived = AZGenericMachineGenerator.derived;
+      if(derivedString != null && !derivedString.equals(""))
+      {
+        if(derivedString.equalsIgnoreCase("true"))
+        {
+          derived = true;
+        }
+        else if(derivedString.equalsIgnoreCase("false"))
+        {
+          derived = false;
+        }
+        else
+        {
+          System.err.println("validation error. derived not set to true or false. was set to: " + derivedString);
+          System.exit(1);
+        }
+      }
+      String outputPath = ((Element)node).getAttribute("outputPath");
+      if(outputPath == null)
+      {
+        outputPath = "";
+      }
+      inputFile = diagram;
+      init();
+      generateFiles(diagram, baseClass, outputPath, makeVirtual, derived);
+    }
+
+    public abstract void generateFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived);
+
+    public String generate(String diagram, String template, String className, boolean makeVirtual)
+    {
+        AZGenericMachineGenerator.CLASS_NAME = className;
+        BufferedReader in = null;
+
+        try
+        {
+            if (in == null)
+            {
+                InputStream is = AZGenericMachineGenerator.class.getResourceAsStream("/az/"
+                        + template);
+                in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            }
+
+            StringBuffer output = genFile(in, makeVirtual);
+
+            in.close();
+
+            return output.toString();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        return null;
+    }
+    
+    public static void writeToFile(String code, String filename)
+    {
+        try
+        {
+            PrintWriter out = new PrintWriter(filename);
+            out.println(code.toString());
+            out.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 }
