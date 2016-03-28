@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 
-public class CodeGenerator extends AZGenericMachineGenerator
+public class CodeGenerator
 {
     static String CLASS_NAME_PREFIX = "AZ";
     static String TEMPLATE_NAME = null;
@@ -105,9 +105,9 @@ public class CodeGenerator extends AZGenericMachineGenerator
     {
         // TODO: Check if the class has already been created. Only create it if it
         // hasn't been.
-        CodeGenerator jenny = new CodeGenerator();
-        CodeGenerator.inputFile = diagram;
-        CodeGenerator.CLASS_NAME = className;
+        CPPGenerator jenny = new CPPGenerator();
+        CPPGenerator.inputFile = diagram;
+        CPPGenerator.CLASS_NAME = className;
         jenny.init();
         BufferedReader in = null;
 
@@ -316,15 +316,15 @@ public class CodeGenerator extends AZGenericMachineGenerator
     {
         processArgs(args);
 
-        CodeGenerator jenny = new CodeGenerator();
-        CodeGenerator.inputFile = STATE_DIAGRAM;
+        CPPGenerator jenny = new CPPGenerator();
+        CPPGenerator.inputFile = STATE_DIAGRAM;
         jenny.init();
 
         for (String fileType : fileTypes)
         {
             try
             {
-                String outputFile = OUTPUT_PATH + CLASS_NAME + fileType;
+                String outputFile = OUTPUT_PATH + CPPGenerator.CLASS_NAME + fileType;
                 File f = new File(outputFile);
 
                 if (f.exists() && !f.isDirectory())
@@ -353,7 +353,7 @@ public class CodeGenerator extends AZGenericMachineGenerator
             String templateName = TEMPLATE_NAME;
             if (fileType.equals(".h"))
             {
-                String outputFile = OUTPUT_PATH + CLASS_NAME + ".h";
+                String outputFile = OUTPUT_PATH + CPPGenerator.CLASS_NAME + ".h";
 
                 String template = null;
 
@@ -407,7 +407,7 @@ public class CodeGenerator extends AZGenericMachineGenerator
             }
             else if (fileType.equals(".cpp"))
             {
-                String outputFile = OUTPUT_PATH + CLASS_NAME + ".cpp";
+                String outputFile = OUTPUT_PATH + CPPGenerator.CLASS_NAME + ".cpp";
 
                 String template = null;
 
@@ -493,7 +493,7 @@ public class CodeGenerator extends AZGenericMachineGenerator
             }
             else if (args[i].equals("--class-name"))
             {
-                CLASS_NAME = args[i + 1];
+                CPPGenerator.CLASS_NAME = args[i + 1];
                 i++;
             }
             else if (args[i].equals("--class-name-prefix"))
@@ -598,7 +598,7 @@ public class CodeGenerator extends AZGenericMachineGenerator
             System.exit(0);
         }
         
-        if (CLASS_NAME == null)
+        if (CPPGenerator.CLASS_NAME == null)
         {
             System.err.println("No class name specified.");
             System.err.println("Specify one with --class-name");
@@ -628,6 +628,6 @@ public class CodeGenerator extends AZGenericMachineGenerator
             System.exit(1);
         }
 
-        CodeGenerator.CLASS_NAME = CLASS_NAME_PREFIX + CLASS_NAME;
+        CPPGenerator.CLASS_NAME = CLASS_NAME_PREFIX + CPPGenerator.CLASS_NAME;
     }
 }
