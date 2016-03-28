@@ -121,6 +121,7 @@
         <copy file="FSMs/TCPClient.cpp" todir="build/classes/az"/>
         <copy file="FSMs/StateDebugger.h" todir="build/classes/az"/>
         <copy file="FSMs/StateDebugger.cpp" todir="build/classes/az"/>
+        <copy file="FSMs/javascript/az.js" todir="build/classes/az/javascript"/>
     </target>
 
     <target name="jar" depends="compile">
