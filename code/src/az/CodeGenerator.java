@@ -42,6 +42,7 @@ public class CodeGenerator extends AZGenericMachineGenerator
     static String STATE_DIAGRAM = null;
     static ArrayList<String> fileTypes = new ArrayList<String>();
     static String projectFile;
+    static String language = null;
 
     // Overwrite existing implementation files?
     static boolean forceOverwrite = false;
@@ -530,6 +531,17 @@ public class CodeGenerator extends AZGenericMachineGenerator
               projectFile = args[i + 1];
               i++;
             }
+            else if (args[i].equals("--language"))
+            {
+                language = args[i + 1];
+                i++;
+                if(!language.equals("javascript") && !language.equalsIgnoreCase("c++"))
+                {
+                    System.err.println("Lanauage: " + language + " is not supported");
+                    System.err.println("Only javascript and c++ are supported");
+                    System.exit(1);
+                }
+            }
             else
             {
                 System.err.println("Flag not recognized: " + args[i]);
@@ -540,39 +552,43 @@ public class CodeGenerator extends AZGenericMachineGenerator
         // Output the automaton code too
         if (outputAutomaton)
         {
-            String azCPP = getPackageFileAsString("AZ.cpp");
-            writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
-
-            String azH = getPackageFileAsString("AZ.h");
-            writeToFile(azH, OUTPUT_PATH + "AZ.h");
-
-            String azHPP = getPackageFileAsString("AZ.t.hpp");
-            writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
-
-            String azJS = getPackageFileAsString("javascript/az.js");
-            writeToFile(azJS, OUTPUT_PATH + "az.js");
-
-            if (derived)
+            if(language == null || language.equalsIgnoreCase("c++"))
             {
-                String automatonCPP = getPackageFileAsString("Automaton.cpp");
-                writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
-
-                String automatonH = getPackageFileAsString("Automaton.h");
-                writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
+                String azCPP = getPackageFileAsString("AZ.cpp");
+                writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
+ 
+                String azH = getPackageFileAsString("AZ.h");
+                writeToFile(azH, OUTPUT_PATH + "AZ.h");
+ 
+                String azHPP = getPackageFileAsString("AZ.t.hpp");
+                writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
+ 
+                if (derived)
+                {
+                    String automatonCPP = getPackageFileAsString("Automaton.cpp");
+                    writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
+ 
+                    String automatonH = getPackageFileAsString("Automaton.h");
+                    writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
+                }
+ 
+                String tcpClientCPP = getPackageFileAsString("TCPClient.cpp");
+                writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
+ 
+                String tcpClientH = getPackageFileAsString("TCPClient.h");
+                writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
+ 
+                String stateDebuggerCPP = getPackageFileAsString("StateDebugger.cpp");
+                writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
+ 
+                String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
+                writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
             }
-
-            String tcpClientCPP = getPackageFileAsString("TCPClient.cpp");
-            writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
-
-            String tcpClientH = getPackageFileAsString("TCPClient.h");
-            writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
-
-            String stateDebuggerCPP = getPackageFileAsString("StateDebugger.cpp");
-            writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
-
-            String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
-            writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
-
+            else if(language.equalsIgnoreCase("javascript"))
+            {
+                String azJS = getPackageFileAsString("javascript/az.js");
+                writeToFile(azJS, OUTPUT_PATH + "az.js");
+            }
             System.exit(0);
         }
 
