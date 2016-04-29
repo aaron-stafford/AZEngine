@@ -1,0 +1,6 @@
+<scxml initial="START_STATE" name="Flappy" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=1170 h=900  -->
+ <state id="START_STATE"><!--   node-size-and-position x=150 y=170 w=75 h=75  -->
+  <transition event="DoSomething" target="MainLoop"></transition>
+ </state>
+ <state id="MainLoop"><!--   node-size-and-position x=380 y=170 w=75 h=75  --></state>
+</scxml>

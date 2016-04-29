@@ -1,0 +1,6 @@
+<project displayName="Example Project">
+  <automaton diagram="Main.scxml" displayName="GameLoop" baseClass="GameLoopBase" makeVirtual="true" derived="true" outputPath=".">
+  </automaton>
+  <automaton diagram="SplashScreen.scxml" displayName="SplashScreen" baseClass="SplashBase" makeVirtual="true" derived="true" outputPath=".">
+  </automaton>
+</project>

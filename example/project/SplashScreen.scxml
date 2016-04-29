@@ -1,0 +1,15 @@
+<scxml initial="START_STATE" name="Flappy" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=0 y=0 w=140 h=610  -->
+ <state id="START_STATE"><!--   node-size-and-position x=20 y=40 w=75 h=75  -->
+  <transition event="StartFadeIn" target="FADE_IN"></transition>
+ </state>
+ <state id="FADE_IN"><!--   node-size-and-position x=20 y=160 w=75 h=75  -->
+  <transition event="FadeInComplete" target="IDLE"></transition>
+ </state>
+ <state id="FADE_OUT"><!--   node-size-and-position x=20 y=390 w=75 h=75  -->
+  <transition event="FadeOutComplete" target="FINISHED"></transition>
+ </state>
+ <final id="FINISHED"><!--   node-size-and-position x=20 y=500 w=75 h=75  --></final>
+ <state id="IDLE"><!--   node-size-and-position x=20 y=280 w=75 h=75  -->
+  <transition event="StartFadeOut" target="FADE_OUT"></transition>
+ </state>
+</scxml>
