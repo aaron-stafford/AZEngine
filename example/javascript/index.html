@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>AZ javascript HTML integration example</title>
+    <script src="../output/az/az.js"></script>
+    <script>
+// START OF az.js CANDIDATE CODE 
+// Actually the following code could probably be put into the az.js file.
+      var updateInterval = 1000 / 30;
+      function update()
+      {
+        // Update state machine from here. Should be something like:
+        // az.update();
+      }
+      function startUpdate() {
+        setInterval(update, updateInterval);
+      }
+// END OF az.js CANDIDATE CODE 
+    </script>
+  </head>
+  <body onload="startUpdate();">
+  </body>
+</html>
