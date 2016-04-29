@@ -14,6 +14,12 @@ java -jar AZClassGenerator.jar --output-automaton
 Creates AZ.h, AZ.cpp, Automaton.h and Automaton.cpp. These are the class
 definitions of the FSM needed to compile code generated from a diagram.
 
+java -jar AZClassGenerator.jar --output-automaton --language javascript
+
+Creates az.js which contains all the implementation of the state machine and
+the implementation of the Automaton base class that all new Automatons should
+derive from.
+
 
 Command line args
 =================
