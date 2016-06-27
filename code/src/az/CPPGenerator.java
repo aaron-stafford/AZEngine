@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +23,7 @@ import org.w3c.dom.NodeList;
 
 public class CPPGenerator extends AZGenericMachineGenerator
 {
+    private static final Logger log = Logger.getLogger(CPPGenerator.class.getName());
     static String TEMPLATE_H = "h.template";
     static String TEMPLATE_CPP = "cpp.template";
     static String TEMPLATE_DERIVED_H = "h.derived.template";
@@ -442,7 +445,6 @@ public class CPPGenerator extends AZGenericMachineGenerator
                             }
                         }
                     }
-
                     else if (key.equals("POPULATE_DEBUG_STATE_INDEX_START"))
                     {
                         Set<String> stateNames = stateIndex.keySet();
@@ -584,9 +586,35 @@ public class CPPGenerator extends AZGenericMachineGenerator
         {
             fileBaseName += File.separator;
         }
-        String cppCode = generateCPP(diagram, className, makeVirtual, derived);
+        String outputFile = fileBaseName + className + ".cpp";
+        log.log(Level.INFO, "Attempting to generated: " + outputFile);
+        String cppCode = null;
+        File f = new File(outputFile);
+        if (f.exists() && !f.isDirectory())
+        {
+          log.log(Level.INFO, "Output file already exists. Using it as the template.");
+          System.exit(1);
+        }
+        else
+        {
+          log.log(Level.INFO, "Output file does not exist. Creating new from template.");
+          cppCode = generateCPP(diagram, className, makeVirtual, derived);
+        }
         writeToFile(cppCode, fileBaseName + className + ".cpp");
-        String hCode = generateH(diagram, className, makeVirtual, derived);
+        outputFile = fileBaseName + className + ".h";
+        log.log(Level.INFO, "Attempting to generated: " + outputFile);
+        String hCode = null;
+        f = new File(outputFile);
+        if (f.exists() && !f.isDirectory())
+        {
+          log.log(Level.INFO, "Output file already exists. Using it as the template.");
+          System.exit(1);
+        }
+        else
+        {
+          log.log(Level.INFO, "Output file does not exist. Creating new from template.");
+          hCode = generateH(diagram, className, makeVirtual, derived);
+        }
         writeToFile(hCode, fileBaseName + className + ".h");
     }
 
