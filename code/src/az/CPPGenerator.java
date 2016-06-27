@@ -33,6 +33,7 @@ public class CPPGenerator extends AZGenericMachineGenerator
             boolean makeVirtual)
     {
         StringBuffer output = new StringBuffer();
+        boolean notFirstLine = false;
 
         try
         {
@@ -43,6 +44,15 @@ public class CPPGenerator extends AZGenericMachineGenerator
                 if(s == null)
                 {
                     break;
+                }
+
+                if(notFirstLine)
+                {
+                  output.append("\n");
+                }
+                else
+                {
+                  notFirstLine = true;
                 }
 
                 Pattern p = Pattern.compile(".*(\\$\\{(.*)\\}).*");
@@ -523,8 +533,6 @@ public class CPPGenerator extends AZGenericMachineGenerator
                 {
                     output.append(s);
                 }
-
-                output.append("\n");
             }
             return output;
         }

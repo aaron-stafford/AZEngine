@@ -2,7 +2,7 @@
 // ${PREAMBLE_END}
 
 #include "${CLASS_NAME}.h"
-#include "AZ.h"
+#include "az/control/AZ.h"
 
 // State methods
 ${STATE_METHODS_DEFINITIONS}

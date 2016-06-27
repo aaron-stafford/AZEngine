@@ -1,14 +1,14 @@
+#ifndef __${CLASS_NAME}__
+#define __${CLASS_NAME}__
+
 // ${PREAMBLE_START}
 // ${PREAMBLE_END}
 
-#include "Automaton.h"
+#include "az/control/Automaton.h"
 
 #ifdef STATE_DEBUGGING
 #include <string>
 #endif
-
-#ifndef __${CLASS_NAME}__
-#define __${CLASS_NAME}__
 
 class ${CLASS_NAME} : public Automaton
 {
