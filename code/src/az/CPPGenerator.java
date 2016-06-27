@@ -593,14 +593,14 @@ public class CPPGenerator extends AZGenericMachineGenerator
         if (f.exists() && !f.isDirectory())
         {
           log.log(Level.INFO, "Output file already exists. Using it as the template.");
-          System.exit(1);
+          cppCode = generateFromExisting(diagram, outputFile, className, makeVirtual);
         }
         else
         {
           log.log(Level.INFO, "Output file does not exist. Creating new from template.");
           cppCode = generateCPP(diagram, className, makeVirtual, derived);
         }
-        writeToFile(cppCode, fileBaseName + className + ".cpp");
+        writeToFile(cppCode, outputFile);
         outputFile = fileBaseName + className + ".h";
         log.log(Level.INFO, "Attempting to generated: " + outputFile);
         String hCode = null;
@@ -608,14 +608,14 @@ public class CPPGenerator extends AZGenericMachineGenerator
         if (f.exists() && !f.isDirectory())
         {
           log.log(Level.INFO, "Output file already exists. Using it as the template.");
-          System.exit(1);
+          hCode = generateFromExisting(diagram, outputFile, className, makeVirtual);
         }
         else
         {
           log.log(Level.INFO, "Output file does not exist. Creating new from template.");
           hCode = generateH(diagram, className, makeVirtual, derived);
         }
-        writeToFile(hCode, fileBaseName + className + ".h");
+        writeToFile(hCode, outputFile);
     }
 
     public void generateDefaultCPPFiles(String diagram, String className, String outputPath)

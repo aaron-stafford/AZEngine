@@ -2,6 +2,7 @@ package az;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -506,6 +507,34 @@ public abstract class AZGenericMachineGenerator
         return null;
     }
     
+    public String generateFromExisting(String diagram, String existingFile, String className, boolean makeVirtual)
+    {
+        AZGenericMachineGenerator.CLASS_NAME = className;
+        BufferedReader in = null;
+
+        try
+        {
+            if (in == null)
+            {
+                FileInputStream is = new FileInputStream(new File(existingFile));
+                in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            }
+
+            StringBuffer output = genFile(in, makeVirtual);
+
+            in.close();
+
+            return output.toString();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        return null;
+    }
+
     public static void writeToFile(String code, String filename)
     {
         try
