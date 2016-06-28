@@ -114,6 +114,7 @@
         <copy file="templates/h.derived.template" todir="build/classes/az"/>
         <copy file="templates/js.template" todir="build/classes/az"/>
         <copy file="templates/EngineBridge.cpp.template" todir="build/classes/az"/>
+        <copy file="templates/EngineBridge.h.template" todir="build/classes/az"/>
         <copy file="FSMs/AZ.h" todir="build/classes/az"/>
         <copy file="FSMs/AZ.cpp" todir="build/classes/az"/>
         <copy file="FSMs/AZ.t.hpp" todir="build/classes/az"/>

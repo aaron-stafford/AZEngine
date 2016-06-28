@@ -34,8 +34,10 @@ import org.xml.sax.InputSource;
 public class EngineBridgeGenerator
 {
     private static final Logger log = Logger.getLogger(EngineBridgeGenerator.class.getName());
-    static String TEMPLATE_CPP = "EngineBridge.cpp.template";
-    private final String outputFile = "../../gameplay/control/generated/EngineBridge.cpp"; // move this to the project file.
+    private final String TEMPLATE_CPP = "EngineBridge.cpp.template";
+    private final String TEMPLATE_H = "EngineBridge.h.template";
+    private final String outputCPPFile = "../../gameplay/control/generated/EngineBridge.cpp"; // move this to the project file.
+    private final String outputHFile = "../../gameplay/control/generated/EngineBridge.h"; // move this to the project file.
     private String projectFile;
     Hashtable<String, String> classNames = new Hashtable<String, String>();
     Hashtable<String, String> rootUpdateClasses = new Hashtable<String, String>();
@@ -94,21 +96,39 @@ public class EngineBridgeGenerator
 
         try
         {
-        this.projectFile = projectFile;
-        log.log(Level.INFO, "Attempting to generated: " + outputFile);
-        String cppCode = null;
-        File f = new File(outputFile);
-        if (f.exists() && !f.isDirectory())
-        {
-          log.log(Level.INFO, "Output file already exists. Overwriting.");
-        }
-        else
-        {
-          log.log(Level.INFO, "Output file does not exist. Creating new from template.");
-        }
-        BufferedReader templateReader = getTemplateReader();
-        String output = populateTemplate(templateReader);
-        writeToFile(output, outputFile);
+          this.projectFile = projectFile;
+          {
+            log.log(Level.INFO, "Attempting to generated: " + outputCPPFile);
+            String cppCode = null;
+            File f = new File(outputCPPFile);
+            if (f.exists() && !f.isDirectory())
+            {
+              log.log(Level.INFO, "Output file already exists. Overwriting.");
+            }
+            else
+            {
+              log.log(Level.INFO, "Output file does not exist. Creating new from template.");
+            }
+            BufferedReader templateReader = getTemplateReader(TEMPLATE_CPP);
+            String output = populateTemplate(templateReader);
+            writeToFile(output, outputCPPFile);
+          }
+          {
+            log.log(Level.INFO, "Attempting to generated: " + outputHFile);
+            String hCode = null;
+            File f = new File(outputHFile);
+            if (f.exists() && !f.isDirectory())
+            {
+              log.log(Level.INFO, "Output file already exists. Overwriting.");
+            }
+            else
+            {
+              log.log(Level.INFO, "Output file does not exist. Creating new from template.");
+            }
+            BufferedReader templateReader = getTemplateReader(TEMPLATE_H);
+            String output = populateTemplate(templateReader);
+            writeToFile(output, outputHFile);
+          }
         }
         catch (Exception e)
         {
@@ -117,7 +137,7 @@ public class EngineBridgeGenerator
         }
     }
 
-    public BufferedReader getTemplateReader()
+    public BufferedReader getTemplateReader(String templateName)
     {
         BufferedReader in = null;
         try
@@ -125,7 +145,7 @@ public class EngineBridgeGenerator
             if (in == null)
             {
                 InputStream is = AbstractGenerator.class.getResourceAsStream("/az/"
-                        + TEMPLATE_CPP);
+                        + templateName);
                 in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             }
             return in;
