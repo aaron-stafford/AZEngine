@@ -21,7 +21,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class CPPGenerator extends AZGenericMachineGenerator
+public class CPPGenerator extends AbstractGenerator
 {
     private static final Logger log = Logger.getLogger(CPPGenerator.class.getName());
     static String TEMPLATE_H = "h.template";

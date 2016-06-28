@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 
-public class CodeGenerator
+public class Main
 {
     static String CLASS_NAME_PREFIX = "AZ";
     static String TEMPLATE_NAME = null;
@@ -39,7 +39,7 @@ public class CodeGenerator
     static ArrayList<String> fileTypes = new ArrayList<String>();
     static String projectFile;
     static String language = null;
-    static AZGenericMachineGenerator generator = null;
+    static AbstractGenerator generator = null;
 
     // Overwrite existing implementation files?
     static boolean forceOverwrite = false;
@@ -51,7 +51,7 @@ public class CodeGenerator
         String content = null;
         try
         {
-            InputStream is = CodeGenerator.class.getResourceAsStream("/az/"
+            InputStream is = Main.class.getResourceAsStream("/az/"
                     + filename);
             InputStreamReader reader = new InputStreamReader(is);
             Scanner scanner = new Scanner(reader);
@@ -99,7 +99,7 @@ public class CodeGenerator
         {
             try
             {
-                String outputFile = OUTPUT_PATH + AZGenericMachineGenerator.CLASS_NAME + fileType;
+                String outputFile = OUTPUT_PATH + AbstractGenerator.CLASS_NAME + fileType;
                 File f = new File(outputFile);
 
                 if (f.exists() && !f.isDirectory())
@@ -128,7 +128,7 @@ public class CodeGenerator
             String templateName = TEMPLATE_NAME;
             if (fileType.equals(".h"))
             {
-                String outputFile = OUTPUT_PATH + AZGenericMachineGenerator.CLASS_NAME + ".h";
+                String outputFile = OUTPUT_PATH + AbstractGenerator.CLASS_NAME + ".h";
 
                 String template = null;
 
@@ -182,7 +182,7 @@ public class CodeGenerator
             }
             else if (fileType.equals(".cpp"))
             {
-                String outputFile = OUTPUT_PATH + AZGenericMachineGenerator.CLASS_NAME + ".cpp";
+                String outputFile = OUTPUT_PATH + AbstractGenerator.CLASS_NAME + ".cpp";
 
                 String template = null;
 
@@ -269,7 +269,7 @@ public class CodeGenerator
             }
             else if (args[i].equals("--class-name"))
             {
-                AZGenericMachineGenerator.CLASS_NAME = args[i + 1];
+                AbstractGenerator.CLASS_NAME = args[i + 1];
                 i++;
             }
             else if (args[i].equals("--class-name-prefix"))
@@ -287,11 +287,11 @@ public class CodeGenerator
             }
             else if (args[i].equals("--not-derived"))
             {
-                AZGenericMachineGenerator.derived = false;
+                AbstractGenerator.derived = false;
             }
             else if (args[i].equals("--make-virtual"))
             {
-                AZGenericMachineGenerator.makeVirtual = true;
+                AbstractGenerator.makeVirtual = true;
             }
             else if (args[i].equals("--file-type"))
             {
@@ -331,39 +331,39 @@ public class CodeGenerator
             if(language == null || language.equalsIgnoreCase("c++"))
             {
                 String azCPP = getPackageFileAsString("AZ.cpp");
-                AZGenericMachineGenerator.writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
+                AbstractGenerator.writeToFile(azCPP, OUTPUT_PATH + "AZ.cpp");
  
                 String azH = getPackageFileAsString("AZ.h");
-                AZGenericMachineGenerator.writeToFile(azH, OUTPUT_PATH + "AZ.h");
+                AbstractGenerator.writeToFile(azH, OUTPUT_PATH + "AZ.h");
  
                 String azHPP = getPackageFileAsString("AZ.t.hpp");
-                AZGenericMachineGenerator.writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
+                AbstractGenerator.writeToFile(azHPP, OUTPUT_PATH + "AZ.t.hpp");
  
-                if (AZGenericMachineGenerator.derived)
+                if (AbstractGenerator.derived)
                 {
                     String automatonCPP = getPackageFileAsString("Automaton.cpp");
-                    AZGenericMachineGenerator.writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
+                    AbstractGenerator.writeToFile(automatonCPP, OUTPUT_PATH + "Automaton.cpp");
  
                     String automatonH = getPackageFileAsString("Automaton.h");
-                    AZGenericMachineGenerator.writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
+                    AbstractGenerator.writeToFile(automatonH, OUTPUT_PATH + "Automaton.h");
                 }
  
                 String tcpClientCPP = getPackageFileAsString("TCPClient.cpp");
-                AZGenericMachineGenerator.writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
+                AbstractGenerator.writeToFile(tcpClientCPP, OUTPUT_PATH + "TCPClient.cpp");
  
                 String tcpClientH = getPackageFileAsString("TCPClient.h");
-                AZGenericMachineGenerator.writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
+                AbstractGenerator.writeToFile(tcpClientH, OUTPUT_PATH + "TCPClient.h");
  
                 String stateDebuggerCPP = getPackageFileAsString("StateDebugger.cpp");
-                AZGenericMachineGenerator.writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
+                AbstractGenerator.writeToFile(stateDebuggerCPP, OUTPUT_PATH + "StateDebugger.cpp");
  
                 String stateDebuggerH = getPackageFileAsString("StateDebugger.h");
-                AZGenericMachineGenerator.writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
+                AbstractGenerator.writeToFile(stateDebuggerH, OUTPUT_PATH + "StateDebugger.h");
             }
             else if(language.equalsIgnoreCase("javascript"))
             {
                 String azJS = getPackageFileAsString("javascript/az.js");
-                AZGenericMachineGenerator.writeToFile(azJS, OUTPUT_PATH + "az.js");
+                AbstractGenerator.writeToFile(azJS, OUTPUT_PATH + "az.js");
             }
             System.exit(0);
         }
@@ -381,7 +381,7 @@ public class CodeGenerator
           System.err.println("No generator defined for language: " + language);
         }
 
-        //AZGenericMachineGenerator.inputFile = STATE_DIAGRAM;
+        //AbstractGenerator.inputFile = STATE_DIAGRAM;
         //generator.init();
 
         if(projectFile != null)
@@ -390,7 +390,7 @@ public class CodeGenerator
             System.exit(0);
         }
         
-        if (AZGenericMachineGenerator.CLASS_NAME == null)
+        if (AbstractGenerator.CLASS_NAME == null)
         {
             System.err.println("No class name specified.");
             System.err.println("Specify one with --class-name");
@@ -409,7 +409,7 @@ public class CodeGenerator
             System.exit(1);
         }
 
-        if (TEMPLATE_NAME != null && !AZGenericMachineGenerator.derived)
+        if (TEMPLATE_NAME != null && !AbstractGenerator.derived)
         {
             System.err.println("Warning: --not-derived has no effect when using a custom template");
         }
@@ -420,6 +420,6 @@ public class CodeGenerator
             System.exit(1);
         }
 
-        AZGenericMachineGenerator.CLASS_NAME = CLASS_NAME_PREFIX + AZGenericMachineGenerator.CLASS_NAME;
+        AbstractGenerator.CLASS_NAME = CLASS_NAME_PREFIX + AbstractGenerator.CLASS_NAME;
     }
 }

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,8 +25,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public abstract class AZGenericMachineGenerator
+public abstract class AbstractGenerator
 {
+    private static final Logger log = Logger.getLogger(AbstractGenerator.class.getName());
     protected class Transition
     {
         String startStateId;
@@ -378,6 +381,8 @@ public abstract class AZGenericMachineGenerator
 
     public void generateFromProject(String projectFile)
     {
+      log.log(Level.INFO, "Attempting generation from project file: " + projectFile);
+      
       try
       {
         File file = new File(projectFile);
@@ -405,12 +410,15 @@ public abstract class AZGenericMachineGenerator
 
     public void recursivelyGenerateFromNode(Node node)
     {
+      log.log(Level.INFO, "Entering recursivelyGenerateFromNode");
       if(node.getNodeName().equals("automaton"))
       {
+        log.log(Level.INFO, "Node name = automaton");
         generateFromProjectNode(node);
         // Need to be recursive at this point.
       }
       NodeList list = node.getChildNodes();
+      log.log(Level.INFO, "Current node has " + list.getLength() + " children");
  
       for (int i = 0 ; i < list.getLength() ; i++)
       {
@@ -431,7 +439,7 @@ public abstract class AZGenericMachineGenerator
         return;
       }
       String virtual = ((Element)node).getAttribute("makeVirtual");
-      boolean makeVirtual = AZGenericMachineGenerator.makeVirtual;
+      boolean makeVirtual = AbstractGenerator.makeVirtual;
       if(virtual != null && !virtual.equals(""))
       {
         if(virtual.equalsIgnoreCase("true"))
@@ -449,7 +457,7 @@ public abstract class AZGenericMachineGenerator
         }
       }
       String derivedString = ((Element)node).getAttribute("derived");
-      boolean derived = AZGenericMachineGenerator.derived;
+      boolean derived = AbstractGenerator.derived;
       if(derivedString != null && !derivedString.equals(""))
       {
         if(derivedString.equalsIgnoreCase("true"))
@@ -480,14 +488,14 @@ public abstract class AZGenericMachineGenerator
 
     public String generate(String diagram, String template, String className, boolean makeVirtual)
     {
-        AZGenericMachineGenerator.CLASS_NAME = className;
+        AbstractGenerator.CLASS_NAME = className;
         BufferedReader in = null;
 
         try
         {
             if (in == null)
             {
-                InputStream is = AZGenericMachineGenerator.class.getResourceAsStream("/az/"
+                InputStream is = AbstractGenerator.class.getResourceAsStream("/az/"
                         + template);
                 in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             }
@@ -509,7 +517,7 @@ public abstract class AZGenericMachineGenerator
     
     public String generateFromExisting(String diagram, String existingFile, String className, boolean makeVirtual)
     {
-        AZGenericMachineGenerator.CLASS_NAME = className;
+        AbstractGenerator.CLASS_NAME = className;
         BufferedReader in = null;
 
         try
