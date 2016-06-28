@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -32,6 +34,7 @@ import org.w3c.dom.Document;
 
 public class Main
 {
+  private static final Logger log = Logger.getLogger(Main.class.getName());
     static String CLASS_NAME_PREFIX = "AZ";
     static String TEMPLATE_NAME = null;
     static String OUTPUT_PATH = "";
@@ -239,6 +242,41 @@ public class Main
 
     private static void processArgs(String[] args)
     {
+        boolean generateFromProject = false;
+        // check if we are processing a project.
+        for (int i = 0; i < args.length; i++)
+        {
+            if (args[i].equals("--generate-from-project"))
+            {
+               generateFromProject = true;
+
+/*
+            else if (args[i].equals("--generate-from-project"))
+            {
+              projectFile = args[i + 1];
+              i++;
+            }
+
+        if(projectFile != null)
+        {
+            generator.generateFromProject(projectFile);
+            System.exit(0);
+        }
+        
+*/
+
+               break;
+            }
+        }
+        if(generateFromProject)
+        {
+            log.log(Level.INFO, "Starting generation from project");
+            ProjectGenerator projectGenerator = new ProjectGenerator();
+            projectGenerator.processArgs(args);
+            projectGenerator.generateCode();
+            log.log(Level.INFO, "Finished generating project");
+            System.exit(1);
+        }
         for (int i = 0; i < args.length; i++)
         {
             if (args[i].equals("--output-path"))
@@ -301,11 +339,6 @@ public class Main
             else if (args[i].equals("--output-automaton"))
             {
                 outputAutomaton = true;
-            }
-            else if (args[i].equals("--generate-from-project"))
-            {
-              projectFile = args[i + 1];
-              i++;
             }
             else if (args[i].equals("--language"))
             {
@@ -384,12 +417,6 @@ public class Main
         //AbstractGenerator.inputFile = STATE_DIAGRAM;
         //generator.init();
 
-        if(projectFile != null)
-        {
-            generator.generateFromProject(projectFile);
-            System.exit(0);
-        }
-        
         if (AbstractGenerator.CLASS_NAME == null)
         {
             System.err.println("No class name specified.");

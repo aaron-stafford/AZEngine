@@ -58,8 +58,9 @@ public abstract class AbstractGenerator
     // Probably should be default, other case is not-derived.
     static boolean derived = true;
 
-    public void init()
+    public void init(String diagram)
     {
+        inputFile = diagram;
         stateIndex.clear();
         eventIndex.clear();
         codeBlocks.clear();
@@ -377,111 +378,6 @@ public abstract class AbstractGenerator
     {
         BufferedReader reader = new BufferedReader(new StringReader(template));
         return genFile(reader, makeVirtual);
-    }
-
-    public void generateFromProject(String projectFile)
-    {
-      log.log(Level.INFO, "Attempting generation from project file: " + projectFile);
-      
-      try
-      {
-        File file = new File(projectFile);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(file);
-        generateFromProject(document);
-      }
-      catch(Exception e)
-      {
-        e.printStackTrace();
-        System.exit(1);
-      }
-    }
-
-    public void generateFromProject(Document projectDocument)
-    {
-      if (projectDocument == null)
-      {
-        System.err.println("Invalid projectDocument");
-        System.exit(1);
-      }
-      recursivelyGenerateFromNode((Node)projectDocument);
-    }
-
-    public void recursivelyGenerateFromNode(Node node)
-    {
-      log.log(Level.INFO, "Entering recursivelyGenerateFromNode");
-      if(node.getNodeName().equals("automaton"))
-      {
-        log.log(Level.INFO, "Node name = automaton");
-        generateFromProjectNode(node);
-        // Need to be recursive at this point.
-      }
-      NodeList list = node.getChildNodes();
-      log.log(Level.INFO, "Current node has " + list.getLength() + " children");
- 
-      for (int i = 0 ; i < list.getLength() ; i++)
-      {
-        Node innerNode = list.item(i);
-        if (innerNode.getNodeType() == Node.ELEMENT_NODE)
-        {
-          recursivelyGenerateFromNode(innerNode);
-        }
-      }
-    }
-
-    public void generateFromProjectNode(Node node)
-    {
-      String diagram = ((Element)node).getAttribute("diagram");
-      String baseClass = ((Element)node).getAttribute("baseClass");
-      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
-      {
-        return;
-      }
-      String virtual = ((Element)node).getAttribute("makeVirtual");
-      boolean makeVirtual = AbstractGenerator.makeVirtual;
-      if(virtual != null && !virtual.equals(""))
-      {
-        if(virtual.equalsIgnoreCase("true"))
-        {
-          makeVirtual = true;
-        }
-        else if(virtual.equalsIgnoreCase("false"))
-        {
-          makeVirtual = false;
-        }
-        else
-        {
-          System.err.println("validation error. makeVirtual not set to true or false. was set to: " + virtual);
-          System.exit(1);
-        }
-      }
-      String derivedString = ((Element)node).getAttribute("derived");
-      boolean derived = AbstractGenerator.derived;
-      if(derivedString != null && !derivedString.equals(""))
-      {
-        if(derivedString.equalsIgnoreCase("true"))
-        {
-          derived = true;
-        }
-        else if(derivedString.equalsIgnoreCase("false"))
-        {
-          derived = false;
-        }
-        else
-        {
-          System.err.println("validation error. derived not set to true or false. was set to: " + derivedString);
-          System.exit(1);
-        }
-      }
-      String outputPath = ((Element)node).getAttribute("outputPath");
-      if(outputPath == null)
-      {
-        outputPath = "";
-      }
-      inputFile = diagram;
-      init();
-      generateFiles(diagram, baseClass, outputPath, makeVirtual, derived);
     }
 
     public abstract void generateFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived);
