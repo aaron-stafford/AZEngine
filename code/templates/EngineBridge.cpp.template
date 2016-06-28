@@ -1,0 +1,60 @@
+// ${PREAMBLE_START}
+// ${PREAMBLE_END}
+
+#include "EngineBridge.h"
+// ${CONTROLLER_INCLUDES_START}
+// ${CONTROLLER_INCLUDES_END}
+
+EngineBridge::EngineBridge() : GameplayEngineBridge()
+{
+}
+
+EngineBridge::~EngineBridge()
+{
+}
+
+void EngineBridge::Init()
+{
+// ${CONTROLLER_CREATION_START}
+// ${CONTROLLER_CREATION_END}
+}
+
+unsigned int EngineBridge::RootControllerCount()
+{
+  return m_RootControllers.size();
+}
+
+Automaton* EngineBridge::GetRootController(unsigned int a_Index)
+{
+  return m_RootControllers.at(a_Index);
+}
+
+unsigned int EngineBridge::TouchDownControllerCount()
+{
+  return m_TouchDownControllers.size();
+}
+
+Automaton* EngineBridge::GetTouchDownController(unsigned int a_Index)
+{
+  return m_TouchDownControllers.at(a_Index);
+}
+
+unsigned int EngineBridge::TouchUpControllerCount()
+{
+  return m_TouchUpControllers.size();
+}
+
+Automaton* EngineBridge::GetTouchUpController(unsigned int a_Index)
+{
+  return m_TouchUpControllers.at(a_Index);
+}
+
+unsigned int EngineBridge::TouchMoveControllerCount()
+{
+  return m_TouchMoveControllers.size();
+}
+
+Automaton* EngineBridge::GetTouchMoveController(unsigned int a_Index)
+{
+  return m_TouchMoveControllers.at(a_Index);
+}

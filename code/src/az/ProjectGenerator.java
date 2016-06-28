@@ -4,12 +4,19 @@
 package az;
 
 import java.io.File;
+import java.io.FileReader;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+
+import org.xml.sax.InputSource;
 
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -53,6 +60,13 @@ public class ProjectGenerator
   public void generateCode()
   {
     log.log(Level.INFO, "Generating code.");
+    generateAutomata();
+    EngineBridgeGenerator generator = new EngineBridgeGenerator();
+    generator.generate(projectFile);
+  }
+
+  public void generateAutomata()
+  {
       try
       {
         File file = new File(projectFile);
