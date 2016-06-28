@@ -44,6 +44,7 @@ public class EngineBridgeGenerator
     Hashtable<String, String> touchUpClasses = new Hashtable<String, String>();
     Hashtable<String, String> touchDownClasses = new Hashtable<String, String>();
     Hashtable<String, String> touchMoveClasses = new Hashtable<String, String>();
+    Hashtable<String, String> instanceNames = new Hashtable<String, String>();
 
     public void generate(String projectFile)
     {
@@ -84,6 +85,11 @@ public class EngineBridgeGenerator
           {
             classNames.put(baseClass, baseClass);
             touchUpClasses.put(baseClass, baseClass);
+          }
+          String instanceName = automaton.getAttribute("instanceName");
+          if(instanceName != null)
+          {
+            instanceNames.put(baseClass, instanceName);
           }
         }
       }
@@ -240,6 +246,11 @@ public class EngineBridgeGenerator
                           if(touchUpClasses.get(className) != null)
                           {
                             output.append("    m_TouchUpControllers.push_back(automaton);\n");
+                          }
+                          String instanceName = instanceNames.get(className);
+                          if(instanceName != null)
+                          {
+                            output.append("    automaton->SetInstanceName(\"" + instanceName + "\");\n");
                           }
                           output.append("  }\n");
                         }
