@@ -380,9 +380,9 @@ public abstract class AbstractGenerator
         return genFile(reader, makeVirtual);
     }
 
-    public abstract void generateFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived);
+    public abstract void generateFiles(String className, String outputPath, boolean makeVirtual, boolean derived);
 
-    public String generate(String diagram, String template, String className, boolean makeVirtual)
+    public String generate(String template, String className, boolean makeVirtual)
     {
         AbstractGenerator.CLASS_NAME = className;
         BufferedReader in = null;
@@ -411,7 +411,7 @@ public abstract class AbstractGenerator
         return null;
     }
     
-    public String generateFromExisting(String diagram, String existingFile, String className, boolean makeVirtual)
+    public String generateFromExisting(String existingFile, String className, boolean makeVirtual)
     {
         AbstractGenerator.CLASS_NAME = className;
         BufferedReader in = null;

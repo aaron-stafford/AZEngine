@@ -249,22 +249,6 @@ public class Main
             if (args[i].equals("--generate-from-project"))
             {
                generateFromProject = true;
-
-/*
-            else if (args[i].equals("--generate-from-project"))
-            {
-              projectFile = args[i + 1];
-              i++;
-            }
-
-        if(projectFile != null)
-        {
-            generator.generateFromProject(projectFile);
-            System.exit(0);
-        }
-        
-*/
-
                break;
             }
         }

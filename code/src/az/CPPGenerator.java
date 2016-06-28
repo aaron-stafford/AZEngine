@@ -544,46 +544,46 @@ public class CPPGenerator extends AbstractGenerator
         return null;
     }
 
-    public String generateDefault(String diagram, String template, String className)
+    public String generateDefault(String template, String className)
     {
-        return generate(diagram, template, className, makeVirtual);
+        return generate(template, className, makeVirtual);
     }
 
-    public String generateCPP(String diagram, String className, boolean makeVirtual, boolean derived)
+    public String generateCPP(String className, boolean makeVirtual, boolean derived)
     {
         if(derived)
         {
-          return generate(diagram, TEMPLATE_DERIVED_CPP, className, makeVirtual);
+          return generate(TEMPLATE_DERIVED_CPP, className, makeVirtual);
         }
         else
         {
-          return generate(diagram, TEMPLATE_CPP, className, makeVirtual);
+          return generate(TEMPLATE_CPP, className, makeVirtual);
         }
     }
 
-    public String generateDefaultCPP(String diagram, String className)
+    public String generateDefaultCPP(String className)
     {
-        return generateDefault(diagram, TEMPLATE_CPP, className);
+        return generateDefault(TEMPLATE_CPP, className);
     }
 
-    public String generateH(String diagram, String className, boolean makeVirtual, boolean derived)
+    public String generateH(String className, boolean makeVirtual, boolean derived)
     {
         if(derived)
         {
-          return generate(diagram, TEMPLATE_DERIVED_H, className, makeVirtual);
+          return generate(TEMPLATE_DERIVED_H, className, makeVirtual);
         }
         else
         {
-          return generate(diagram, TEMPLATE_H, className, makeVirtual);
+          return generate(TEMPLATE_H, className, makeVirtual);
         }
     }
 
-    public String generateDefaultH(String diagram, String className)
+    public String generateDefaultH(String className)
     {
-        return generateDefault(diagram, TEMPLATE_H, className);
+        return generateDefault(TEMPLATE_H, className);
     }
     
-    public void generateFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived)
+    public void generateFiles(String className, String outputPath, boolean makeVirtual, boolean derived)
     {
         String fileBaseName = outputPath;
         if(fileBaseName == null)
@@ -601,12 +601,12 @@ public class CPPGenerator extends AbstractGenerator
         if (f.exists() && !f.isDirectory())
         {
           log.log(Level.INFO, "Output file already exists. Using it as the template.");
-          cppCode = generateFromExisting(diagram, outputFile, className, makeVirtual);
+          cppCode = generateFromExisting(outputFile, className, makeVirtual);
         }
         else
         {
           log.log(Level.INFO, "Output file does not exist. Creating new from template.");
-          cppCode = generateCPP(diagram, className, makeVirtual, derived);
+          cppCode = generateCPP(className, makeVirtual, derived);
         }
         writeToFile(cppCode, outputFile);
         outputFile = fileBaseName + className + ".h";
@@ -616,21 +616,21 @@ public class CPPGenerator extends AbstractGenerator
         if (f.exists() && !f.isDirectory())
         {
           log.log(Level.INFO, "Output file already exists. Using it as the template.");
-          hCode = generateFromExisting(diagram, outputFile, className, makeVirtual);
+          hCode = generateFromExisting(outputFile, className, makeVirtual);
         }
         else
         {
           log.log(Level.INFO, "Output file does not exist. Creating new from template.");
-          hCode = generateH(diagram, className, makeVirtual, derived);
+          hCode = generateH(className, makeVirtual, derived);
         }
         writeToFile(hCode, outputFile);
     }
 
-    public void generateDefaultCPPFiles(String diagram, String className, String outputPath)
+    public void generateDefaultCPPFiles(String className, String outputPath)
     {
-        String cppCode = generateDefaultCPP(diagram, className);
+        String cppCode = generateDefaultCPP(className);
         writeToFile(cppCode, className + ".cpp");
-        String hCode = generateDefaultH(diagram, className);
+        String hCode = generateDefaultH(className);
         writeToFile(hCode, className + ".h");
     }
 }

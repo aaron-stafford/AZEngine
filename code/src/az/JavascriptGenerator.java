@@ -532,7 +532,7 @@ public class JavascriptGenerator extends AbstractGenerator
         return null;
     }
 
-    public void generateFiles(String diagram, String className, String outputPath, boolean makeVirtual, boolean derived)
+    public void generateFiles(String className, String outputPath, boolean makeVirtual, boolean derived)
     {
         String fileBaseName = outputPath;
         if(fileBaseName == null)
@@ -543,19 +543,19 @@ public class JavascriptGenerator extends AbstractGenerator
         {
             fileBaseName += File.separator;
         }
-        String code = generateJavascript(diagram, className, makeVirtual, derived);
+        String code = generateJavascript(className, makeVirtual, derived);
         writeToFile(code, fileBaseName + className + ".js");
     }
 
-    public String generateJavascript(String diagram, String className, boolean makeVirtual, boolean derived)
+    public String generateJavascript(String className, boolean makeVirtual, boolean derived)
     {
         if(derived)
         {
-          return generate(diagram, TEMPLATE_JS, className, makeVirtual);
+          return generate(TEMPLATE_JS, className, makeVirtual);
         }
         else
         {
-          return generate(diagram, TEMPLATE_JS, className, makeVirtual);
+          return generate(TEMPLATE_JS, className, makeVirtual);
         }
     }
 }

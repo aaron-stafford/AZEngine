@@ -148,7 +148,7 @@ public class ProjectGenerator
       {
         CPPGenerator generator = new CPPGenerator();
         generator.init(diagram);
-        generator.generateFiles(diagram, baseClass, outputPath, makeVirtual, derived);
+        generator.generateFiles(baseClass, outputPath, makeVirtual, derived);
       }
     }
 }
