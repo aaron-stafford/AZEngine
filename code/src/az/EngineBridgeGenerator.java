@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,35 +35,61 @@ public class EngineBridgeGenerator
 {
     private static final Logger log = Logger.getLogger(EngineBridgeGenerator.class.getName());
     static String TEMPLATE_CPP = "EngineBridge.cpp.template";
-    private static final String outputFile = "../../gameplay/control/EngineBridge.cpp"; // move this to the project file.
+    private final String outputFile = "../../gameplay/control/generated/EngineBridge.cpp"; // move this to the project file.
     private String projectFile;
-    
+    Hashtable<String, String> classNames = new Hashtable<String, String>();
+    Hashtable<String, String> rootUpdateClasses = new Hashtable<String, String>();
+    Hashtable<String, String> touchUpClasses = new Hashtable<String, String>();
+    Hashtable<String, String> touchDownClasses = new Hashtable<String, String>();
+    Hashtable<String, String> touchMoveClasses = new Hashtable<String, String>();
+
     public void generate(String projectFile)
     {
       log.log(Level.INFO, "Generating Engine Bridge...");
-
-
       try
       {
-    XPathFactory factory = XPathFactory.newInstance();
-    XPath xPath = factory.newXPath();
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xPath = factory.newXPath();
 
-    NodeList automata = (NodeList) xPath.evaluate("/project/automaton", new InputSource(new FileReader(
-        projectFile)), XPathConstants.NODESET);
-    log.log(Level.INFO, "found " + automata.getLength() + " node(s) in: " + projectFile);
-    for (int i = 0; i < automata.getLength(); i++) {
-      Element automaton = (Element) automata.item(i);
-      String displayName = automaton.getAttribute("displayName");
-      String baseClass = automaton.getAttribute("baseClass");
-      log.log(Level.INFO, "displayName = " + displayName);
-      log.log(Level.INFO, "baseClass = " + baseClass);
-    }
-        }
-        catch(Exception e)
+        NodeList automata = (NodeList) xPath.evaluate("/project/automaton", new InputSource(new FileReader(
+            projectFile)), XPathConstants.NODESET);
+        log.log(Level.INFO, "found " + automata.getLength() + " node(s) in: " + projectFile);
+        for (int i = 0; i < automata.getLength(); i++)
         {
-          log.log(Level.SEVERE, "Caught exception while processing the project document", e);
-          System.exit(1);
+          Element automaton = (Element) automata.item(i);
+          String displayName = automaton.getAttribute("displayName");
+          String baseClass = automaton.getAttribute("baseClass");
+          String addToRootUpdate = automaton.getAttribute("addToRootUpdate");
+          if(addToRootUpdate.equalsIgnoreCase("true"))
+          {
+            classNames.put(baseClass, baseClass);
+            rootUpdateClasses.put(baseClass, baseClass);
+          }
+          String registerTouchDown = automaton.getAttribute("registerTouchDown");
+          if(registerTouchDown.equalsIgnoreCase("true"))
+          {
+            classNames.put(baseClass, baseClass);
+            touchDownClasses.put(baseClass, baseClass);
+          }
+          String registerTouchMove = automaton.getAttribute("registerTouchMove");
+          if(registerTouchMove.equalsIgnoreCase("true"))
+          {
+            classNames.put(baseClass, baseClass);
+            touchMoveClasses.put(baseClass, baseClass);
+          }
+          String registerTouchUp = automaton.getAttribute("registerTouchUp");
+          if(registerTouchUp.equalsIgnoreCase("true"))
+          {
+            classNames.put(baseClass, baseClass);
+            touchUpClasses.put(baseClass, baseClass);
+          }
         }
+      }
+      catch(Exception e)
+      {
+        log.log(Level.SEVERE, "Caught exception while processing the project document", e);
+        System.exit(1);
+      }
 
 
         try
@@ -159,6 +186,83 @@ public class EngineBridgeGenerator
                                 String newKey = matches.group(2);
 
                                 if (newKey.equals("PREAMBLE_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("CONTROLLER_CREATION_START"))
+                    {
+                        output.append(s + "\n");
+
+
+                        Enumeration<String> enumKey = classNames.keys();
+                        while(enumKey.hasMoreElements())
+                        {
+                          String className = enumKey.nextElement();
+                          output.append("  {\n");
+                          output.append("    Automaton* automaton = new " + className + "();\n");
+                          output.append("    automaton->InitAutomaton();\n");
+                          if(rootUpdateClasses.get(className) != null)
+                          {
+                            output.append("    m_RootControllers.push_back(automaton);\n");
+                          }
+                          if(touchDownClasses.get(className) != null)
+                          {
+                            output.append("    m_TouchDownControllers.push_back(automaton);\n");
+                          }
+                          if(touchMoveClasses.get(className) != null)
+                          {
+                            output.append("    m_TouchMoveControllers.push_back(automaton);\n");
+                          }
+                          if(touchUpClasses.get(className) != null)
+                          {
+                            output.append("    m_TouchUpControllers.push_back(automaton);\n");
+                          }
+                          output.append("  }\n");
+                        }
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("CONTROLLER_CREATION_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("CONTROLLER_INCLUDES_START"))
+                    {
+                        output.append(s + "\n");
+
+
+                        Enumeration<String> enumKey = classNames.keys();
+                        while(enumKey.hasMoreElements())
+                        {
+                          String className = enumKey.nextElement();
+                          output.append("#include \"" + className + ".h\"\n");
+                        }
+
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+
+                                if (newKey.equals("CONTROLLER_INCLUDES_END"))
                                 {
                                     output.append(tempString);
                                     break;
