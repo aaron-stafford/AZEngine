@@ -129,8 +129,11 @@ public class CPPGenerator extends AbstractGenerator
                         output.append(s + "\n");
                         for (String eventName : orderedEventSet)
                         {
-                            output.append("  static const int " + eventName + " = "
+                            if(engineEvents.get(eventName) == null)
+                            {
+                                output.append("  static const int " + eventName + " = "
                                     + eventIndex.get(eventName) + ";\n");
+                            }
                         }
 
                         while (templateReader.ready())

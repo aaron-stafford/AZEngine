@@ -44,9 +44,11 @@ public abstract class AbstractGenerator
 
     static Hashtable<String, Integer> stateIndex = new Hashtable<String, Integer>();
     static Hashtable<String, Integer> eventIndex = new Hashtable<String, Integer>();
+    static Hashtable<String, Integer> engineEvents = new Hashtable<String, Integer>();
     static Hashtable<String, String> codeBlocks = new Hashtable<String, String>();
     static ArrayList<Transition> transitions = new ArrayList<Transition>();
-
+    static final int EVENTS_INDEX_START = 20; // reserved engine event range 0 - 19
+    int localEventsCounter = 0;
     static String inputFile = null;
     static String CLASS_NAME = null;
     static String STATE_METHOD_PREFIX = "AZ_";
@@ -66,8 +68,17 @@ public abstract class AbstractGenerator
         codeBlocks.clear();
         transitions.clear();
         codeTransitions.clear();
+        engineEvents.clear();
+        populateEngineEvents();
         populateIndexes();
         generateDatabase();
+    }
+
+    public void populateEngineEvents()
+    {
+      engineEvents.put("TouchDown", 1);
+      engineEvents.put("TouchUp", 2);
+      engineEvents.put("TouchMove", 3);
     }
 
     public void populateIndexes()
@@ -156,8 +167,16 @@ public abstract class AbstractGenerator
 
                                 if (exists == null)
                                 {
-                                    eventIndex.put(eventID, eventIndex.keySet()
-                                            .size() + 1);
+                                    Integer value = engineEvents.get(eventID);
+                                    if(value == null)
+                                    {
+                                      eventIndex.put(eventID, EVENTS_INDEX_START + localEventsCounter);
+                                      localEventsCounter++;
+                                    }
+                                    else
+                                    {
+                                      eventIndex.put(eventID, value);
+                                    }
                                 }
 
                                 System.out.println("Target : "
