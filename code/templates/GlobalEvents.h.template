@@ -1,0 +1,10 @@
+#ifndef __GLOBALEVENTS_H__
+#define __GLOBALEVENTS_H__
+
+// ${PREAMBLE_START}
+// ${PREAMBLE_END}
+
+// Input indexes
+// ${INPUT_INDEXES_START}
+// ${INPUT_INDEXES_END}
+#endif

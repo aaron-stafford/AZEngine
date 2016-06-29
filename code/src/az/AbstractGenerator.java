@@ -43,12 +43,9 @@ public abstract class AbstractGenerator
     }
 
     static Hashtable<String, Integer> stateIndex = new Hashtable<String, Integer>();
-    static Hashtable<String, Integer> eventIndex = new Hashtable<String, Integer>();
-    static Hashtable<String, Integer> engineEvents = new Hashtable<String, Integer>();
+    static Hashtable<String, Integer> localEventIndex = new Hashtable<String, Integer>();
     static Hashtable<String, String> codeBlocks = new Hashtable<String, String>();
     static ArrayList<Transition> transitions = new ArrayList<Transition>();
-    static final int EVENTS_INDEX_START = 20; // reserved engine event range 0 - 19
-    int localEventsCounter = 0;
     static String inputFile = null;
     static String CLASS_NAME = null;
     static String STATE_METHOD_PREFIX = "AZ_";
@@ -59,26 +56,26 @@ public abstract class AbstractGenerator
     // Preference is for the class to be derived from an Automaton.
     // Probably should be default, other case is not-derived.
     static boolean derived = true;
+    protected Hashtable<String, Integer> globalEventIndex = null;
+    protected Hashtable<String, Integer> engineEventIndex = null;
+
+    public AbstractGenerator(Hashtable<String, Integer> globalEventIndex,
+      Hashtable<String, Integer> engineEventIndex)
+    {
+      this.globalEventIndex = globalEventIndex;
+      this.engineEventIndex = engineEventIndex;
+    }
 
     public void init(String diagram)
     {
         inputFile = diagram;
         stateIndex.clear();
-        eventIndex.clear();
+        localEventIndex.clear();
         codeBlocks.clear();
         transitions.clear();
         codeTransitions.clear();
-        engineEvents.clear();
-        populateEngineEvents();
         populateIndexes();
         generateDatabase();
-    }
-
-    public void populateEngineEvents()
-    {
-      engineEvents.put("TouchDown", 1);
-      engineEvents.put("TouchUp", 2);
-      engineEvents.put("TouchMove", 3);
     }
 
     public void populateIndexes()
@@ -163,19 +160,24 @@ public abstract class AbstractGenerator
                             {
                                 System.out.println("Event : " + eventID);
 
-                                exists = eventIndex.get(eventID);
+                                exists = localEventIndex.get(eventID);
 
                                 if (exists == null)
                                 {
-                                    Integer value = engineEvents.get(eventID);
+                                    Integer value = engineEventIndex.get(eventID);
                                     if(value == null)
                                     {
-                                      eventIndex.put(eventID, EVENTS_INDEX_START + localEventsCounter);
-                                      localEventsCounter++;
+                                      value = globalEventIndex.get(eventID);
+                                      if(value == null)
+                                      {
+                                        log.log(Level.SEVERE, "Event not found in global event list");
+                                        System.exit(1);
+                                      }
+                                      localEventIndex.put(eventID, value);
                                     }
                                     else
                                     {
-                                      eventIndex.put(eventID, value);
+                                      localEventIndex.put(eventID, value);
                                     }
                                 }
 
@@ -234,12 +236,12 @@ public abstract class AbstractGenerator
         // List all events with their new ids
         System.out.println("event ID mappings:");
 
-        Set<String> eventIDSet = eventIndex.keySet();
+        Set<String> eventIDSet = localEventIndex.keySet();
         TreeSet<String> orderedEventSet = new TreeSet<String>(eventIDSet);
 
         for (String eventID : orderedEventSet)
         {
-            System.out.println(eventID + ": " + eventIndex.get(eventID));
+            System.out.println(eventID + ": " + localEventIndex.get(eventID));
         }
     }
 
@@ -305,7 +307,7 @@ public abstract class AbstractGenerator
                             {
                                 System.out.println("Event : " + eventID);
 
-                                exists = eventIndex.get(eventID);
+                                exists = localEventIndex.get(eventID);
 
                                 if (exists == null)
                                 {
@@ -381,12 +383,12 @@ public abstract class AbstractGenerator
         // List all events with their new ids
         System.out.println("event ID mappings:");
 
-        Set<String> eventIDSet = eventIndex.keySet();
+        Set<String> eventIDSet = localEventIndex.keySet();
         TreeSet<String> orderedEventSet = new TreeSet<String>(eventIDSet);
 
         for (String eventID : orderedEventSet)
         {
-            System.out.println(eventID + ": " + eventIndex.get(eventID));
+            System.out.println(eventID + ": " + localEventIndex.get(eventID));
         }
     }
 

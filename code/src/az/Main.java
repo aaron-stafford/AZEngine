@@ -46,9 +46,7 @@ public class Main
 
     // Overwrite existing implementation files?
     static boolean forceOverwrite = false;
-
     static boolean outputAutomaton = false;
-    
     private static String getPackageFileAsString(String filename)
     {
         String content = null;
@@ -385,6 +383,7 @@ public class Main
             System.exit(0);
         }
 
+/*
         if(language == null || language.equalsIgnoreCase("c++"))
         {
           generator = new CPPGenerator();
@@ -432,5 +431,6 @@ public class Main
         }
 
         AbstractGenerator.CLASS_NAME = CLASS_NAME_PREFIX + AbstractGenerator.CLASS_NAME;
+*/
     }
 }

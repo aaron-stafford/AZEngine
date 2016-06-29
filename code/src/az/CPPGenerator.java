@@ -29,6 +29,12 @@ public class CPPGenerator extends AbstractGenerator
     static String TEMPLATE_DERIVED_H = "h.derived.template";
     static String TEMPLATE_DERIVED_CPP = "cpp.derived.template";
 
+    public CPPGenerator(Hashtable<String, Integer> globalEventIndex,
+      Hashtable<String, Integer> engineEventIndex)
+    {
+      super(globalEventIndex, engineEventIndex);
+    }
+
     public StringBuffer genFile(BufferedReader templateReader,
             boolean makeVirtual)
     {
@@ -122,20 +128,21 @@ public class CPPGenerator extends AbstractGenerator
                     }
                     else if (key.equals("INPUT_INDEXES_START"))
                     {
-                        Set<String> eventNames = eventIndex.keySet();
+                        output.append(s + "\n");
+/*
+                        Set<String> eventNames = localEventIndex.keySet();
                         TreeSet<String> orderedEventSet = new TreeSet<String>(
                                 eventNames);
 
-                        output.append(s + "\n");
                         for (String eventName : orderedEventSet)
                         {
-                            if(engineEvents.get(eventName) == null)
+                            if(engineEventIndex.get(eventName) == null)
                             {
                                 output.append("  static const int " + eventName + " = "
-                                    + eventIndex.get(eventName) + ";\n");
+                                    + localEventIndex.get(eventName) + ";\n");
                             }
                         }
-
+*/
                         while (templateReader.ready())
                         {
                             String tempString = templateReader.readLine();
@@ -370,7 +377,7 @@ public class CPPGenerator extends AbstractGenerator
                     }
                     else if (key.equals("POPULATE_DEBUG_INPUT_INDEX_START"))
                     {
-                        Set<String> eventNames = eventIndex.keySet();
+                        Set<String> eventNames = localEventIndex.keySet();
                         TreeSet<String> orderedEventSet = new TreeSet<String>(
                                 eventNames);
 
@@ -487,7 +494,7 @@ public class CPPGenerator extends AbstractGenerator
                     }
                     else if (key.equals("DEBUG_INPUT_INDEXES_START"))
                     {
-                        Set<String> eventNames = eventIndex.keySet();
+                        Set<String> eventNames = localEventIndex.keySet();
                         output.append(s + "\n");
                         output.append("  std::string m_DebugInputIndex[" + eventNames.size() + "];\n");
 

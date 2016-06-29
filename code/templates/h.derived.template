@@ -5,6 +5,7 @@
 // ${PREAMBLE_END}
 
 #include "az/control/Automaton.h"
+#include "GlobalEvents.h"
 
 #ifdef STATE_DEBUGGING
 #include <string>

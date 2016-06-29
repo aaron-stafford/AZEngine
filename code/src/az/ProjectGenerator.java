@@ -6,15 +6,12 @@ package az;
 import java.io.File;
 import java.io.FileReader;
 
+import java.util.Hashtable;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 import org.xml.sax.InputSource;
 
@@ -29,6 +26,8 @@ public class ProjectGenerator
   private static final Logger log = Logger.getLogger(ProjectGenerator.class.getName());
   private String language = "c++"; // should read this from the command line.
   private String projectFile = null;
+  private Hashtable<String, Integer> engineEvents = new Hashtable<String, Integer>();
+  private Hashtable<String, Integer> globalEventIndex = null;
   public ProjectGenerator()
   {
     log.log(Level.INFO, "Project generator instantiated");
@@ -60,9 +59,20 @@ public class ProjectGenerator
   public void generateCode()
   {
     log.log(Level.INFO, "Generating code.");
+    populateEngineEvents();
+    GlobalEventsGenerator eventsGenerator = new GlobalEventsGenerator(projectFile, engineEvents);
+    globalEventIndex = eventsGenerator.getGlobalEventIndex();
+    eventsGenerator.generate();
     generateAutomata();
     EngineBridgeGenerator generator = new EngineBridgeGenerator();
     generator.generate(projectFile);
+  }
+
+  public void populateEngineEvents()
+  {
+    engineEvents.put("TouchDown", 1);
+    engineEvents.put("TouchUp", 2);
+    engineEvents.put("TouchMove", 3);
   }
 
   public void generateAutomata()
@@ -79,12 +89,12 @@ public class ProjectGenerator
           System.exit(1);
         }
         recursivelyGenerateFromNode((Node)document);
-        }
-        catch(Exception e)
-        {
-          log.log(Level.SEVERE, "Caught exception while processing the project document", e);
-          System.exit(1);
-        }
+      }
+      catch(Exception e)
+      {
+        log.log(Level.SEVERE, "Caught exception while processing the project document", e);
+        System.exit(1);
+      }
   }
 
     public void recursivelyGenerateFromNode(Node node)
@@ -160,7 +170,7 @@ public class ProjectGenerator
       }
       if(language.equals("c++"))
       {
-        CPPGenerator generator = new CPPGenerator();
+        CPPGenerator generator = new CPPGenerator(globalEventIndex, engineEvents);
         generator.init(diagram);
         generator.generateFiles(baseClass, outputPath, makeVirtual, derived);
       }

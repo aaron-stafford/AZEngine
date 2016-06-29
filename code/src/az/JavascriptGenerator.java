@@ -23,6 +23,11 @@ public class JavascriptGenerator extends AbstractGenerator
 {
     static String TEMPLATE_JS = "js.template";
 
+    public JavascriptGenerator(Hashtable<String, Integer> globalEventIndex,
+      Hashtable<String, Integer> engineEventIndex)
+    {
+      super(globalEventIndex, engineEventIndex);
+    }
     public StringBuffer genFile(BufferedReader templateReader,
             boolean makeVirtual)
     {
@@ -106,7 +111,7 @@ public class JavascriptGenerator extends AbstractGenerator
                     }
                     else if (key.equals("INPUT_INDEXES_START"))
                     {
-                        Set<String> eventNames = eventIndex.keySet();
+                        Set<String> eventNames = localEventIndex.keySet();
                         TreeSet<String> orderedEventSet = new TreeSet<String>(
                                 eventNames);
 
@@ -114,7 +119,7 @@ public class JavascriptGenerator extends AbstractGenerator
                         for (String eventName : orderedEventSet)
                         {
                             output.append("    this." + eventName + " = "
-                                    + eventIndex.get(eventName) + ";\n");
+                                    + localEventIndex.get(eventName) + ";\n");
                         }
 
                         while (templateReader.ready())
@@ -352,7 +357,7 @@ public class JavascriptGenerator extends AbstractGenerator
                     }
                     else if (key.equals("POPULATE_DEBUG_INPUT_INDEX_START"))
                     {
-                        Set<String> eventNames = eventIndex.keySet();
+                        Set<String> eventNames = localEventIndex.keySet();
                         TreeSet<String> orderedEventSet = new TreeSet<String>(
                                 eventNames);
 
@@ -470,7 +475,7 @@ public class JavascriptGenerator extends AbstractGenerator
                     }
                     else if (key.equals("DEBUG_INPUT_INDEXES_START"))
                     {
-                        Set<String> eventNames = eventIndex.keySet();
+                        Set<String> eventNames = localEventIndex.keySet();
                         output.append(s + "\n");
                         output.append("  std::string m_DebugInputIndex[" + eventNames.size() + "];\n");
 
