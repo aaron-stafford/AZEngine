@@ -385,7 +385,7 @@ public class CPPGenerator extends AbstractGenerator
 
                         for (String eventName : orderedEventSet)
                         {
-                            output.append("  m_DebugInputIndex[" + eventName + "] = \"" + eventName + "\";\n");
+//                            output.append("  m_DebugInputIndex[" + eventName + "] = \"" + eventName + "\";\n");
                         }
 
                         while (templateReader.ready())
@@ -438,7 +438,7 @@ public class CPPGenerator extends AbstractGenerator
 
                         output.append("  inline std::string GetInputAsText(int InputIndex)\n");
                         output.append("  {\n");
-                        output.append("      return m_DebugInputIndex[InputIndex];\n");
+                        output.append("      return az::debugInputIndex[InputIndex];\n");
                         output.append("  }\n");
                         output.append("  \n");
 

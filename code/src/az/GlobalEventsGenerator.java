@@ -235,7 +235,7 @@ public class GlobalEventsGenerator
                     else if (key.equals("DEBUG_INPUT_INDEXES_START"))
                     {
                         output.append(s + "\n");
-                        output.append("static std::string myArray[" + orderedEventNames.length + "] = {" );
+                        output.append("static std::string debugInputIndex[" + orderedEventNames.length + "] = {" );
                         for(String eventName : orderedEventNames)
                         {
                           output.append("\"" + eventName + "\",");
