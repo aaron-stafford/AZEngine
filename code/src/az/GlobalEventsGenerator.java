@@ -41,6 +41,7 @@ public class GlobalEventsGenerator
     private final String TEMPLATE_H = "GlobalEvents.h.template";
     private final String outputHFile = "../../gameplay/control/generated/GlobalEvents.h"; // move this to the project file.
     private String projectFile = null;
+    private String[] orderedEventNames;
 
     public GlobalEventsGenerator(String projectFile, Hashtable<String, Integer> engineEvents)
     {
@@ -63,6 +64,7 @@ public class GlobalEventsGenerator
           String diagram = automaton.getAttribute("diagram");
           processDiagram(diagram);
         }
+        createdOrderedEventNames();
         return globalEventIndex;
       }
       catch(Exception e)
@@ -71,6 +73,25 @@ public class GlobalEventsGenerator
         System.exit(1);
       }
       return null;
+    }
+
+    private void createdOrderedEventNames()
+    {
+      orderedEventNames = new String[EVENTS_INDEX_START + localEventsCounter + 1];
+      Set<String> engineEventNames = engineEvents.keySet();
+      TreeSet<String> engineEventSet = new TreeSet<String>(
+              engineEventNames);
+      for (String eventName : engineEventSet)
+      {
+        orderedEventNames[engineEvents.get(eventName)] = eventName;
+      }
+      Set<String> globalEventNames = globalEventIndex.keySet();
+      TreeSet<String> globalEventSet = new TreeSet<String>(
+              globalEventNames);
+      for (String eventName : globalEventSet)
+      {
+        orderedEventNames[globalEventIndex.get(eventName)] = eventName;
+      }
     }
 
     public void generate()
@@ -204,6 +225,31 @@ public class GlobalEventsGenerator
                                 String newKey = matches.group(2);
 
                                 if (newKey.equals("INPUT_INDEXES_END"))
+                                {
+                                    output.append(tempString);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (key.equals("DEBUG_INPUT_INDEXES_START"))
+                    {
+                        output.append(s + "\n");
+                        output.append("static std::string myArray[" + orderedEventNames.length + "] = {" );
+                        for(String eventName : orderedEventNames)
+                        {
+                          output.append("\"" + eventName + "\",");
+                        }
+                        output.append("};\n");
+                        while (templateReader.ready())
+                        {
+                            String tempString = templateReader.readLine();
+                            Matcher matches = p.matcher(tempString);
+                            boolean didMatch = matches.matches();
+                            if (didMatch)
+                            {
+                                String newKey = matches.group(2);
+                                if (newKey.equals("DEBUG_INPUT_INDEXES_END"))
                                 {
                                     output.append(tempString);
                                     break;

@@ -4,7 +4,16 @@
 // ${PREAMBLE_START}
 // ${PREAMBLE_END}
 
+namespace az
+{
 // Input indexes
 // ${INPUT_INDEXES_START}
 // ${INPUT_INDEXES_END}
+
+#ifdef STATE_DEBUGGING
+// Debug input index entries 
+// ${DEBUG_INPUT_INDEXES_START}
+// ${DEBUG_INPUT_INDEXES_END}
+#endif
+}
 #endif

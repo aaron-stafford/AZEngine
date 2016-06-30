@@ -11,6 +11,8 @@
 #include <string>
 #endif
 
+using namespace az;
+
 class ${CLASS_NAME} : public Automaton
 {
 public:
