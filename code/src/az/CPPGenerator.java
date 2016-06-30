@@ -496,7 +496,7 @@ public class CPPGenerator extends AbstractGenerator
                     {
                         Set<String> eventNames = localEventIndex.keySet();
                         output.append(s + "\n");
-                        output.append("  std::string m_DebugInputIndex[" + eventNames.size() + "];\n");
+//                        output.append("  std::string m_DebugInputIndex[" + eventNames.size() + "];\n");
 
                         while (templateReader.ready())
                         {
