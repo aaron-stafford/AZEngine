@@ -36,6 +36,7 @@ public class ProjectGenerator
   public void processArgs(String[] args)
   {
     log.log(Level.INFO, "Processing args...");
+
     for (int i = 0; i < args.length; i++)
     {
       if (args[i].equals("--generate-from-project"))
@@ -43,9 +44,11 @@ public class ProjectGenerator
         projectFile = args[i + 1];
         break;
       }
+
       // could probably define the language on the command line.
     }
-    if(projectFile == null)
+
+    if (projectFile == null)
     {
       log.log(Level.SEVERE, "No project file specified");
       System.exit(1);
@@ -77,102 +80,115 @@ public class ProjectGenerator
 
   public void generateAutomata()
   {
-      try
+    try
+    {
+      File file = new File(projectFile);
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      Document document = builder.parse(file);
+
+      if (document == null)
       {
-        File file = new File(projectFile);
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(file);
-        if (document == null)
-        {
-          log.log(Level.SEVERE, "Invalid Document (XML processing)");
-          System.exit(1);
-        }
-        recursivelyGenerateFromNode((Node)document);
-      }
-      catch(Exception e)
-      {
-        log.log(Level.SEVERE, "Caught exception while processing the project document", e);
+        log.log(Level.SEVERE, "Invalid Document (XML processing)");
         System.exit(1);
       }
+
+      recursivelyGenerateFromNode((Node)document);
+    }
+    catch (Exception e)
+    {
+      log.log(Level.SEVERE, "Caught exception while processing the project document", e);
+      System.exit(1);
+    }
   }
 
-    public void recursivelyGenerateFromNode(Node node)
+  public void recursivelyGenerateFromNode(Node node)
+  {
+    log.log(Level.INFO, "Entering recursivelyGenerateFromNode");
+
+    if (node.getNodeName().equals("automaton"))
     {
-      log.log(Level.INFO, "Entering recursivelyGenerateFromNode");
-      if(node.getNodeName().equals("automaton"))
+      log.log(Level.INFO, "Node name = automaton");
+      generateFromProjectNode(node);
+      // Need to be recursive at this point.
+    }
+
+    NodeList list = node.getChildNodes();
+    log.log(Level.INFO, "Current node has " + list.getLength() + " children");
+
+    for (int i = 0 ; i < list.getLength() ; i++)
+    {
+      Node innerNode = list.item(i);
+
+      if (innerNode.getNodeType() == Node.ELEMENT_NODE)
       {
-        log.log(Level.INFO, "Node name = automaton");
-        generateFromProjectNode(node);
-        // Need to be recursive at this point.
+        recursivelyGenerateFromNode(innerNode);
       }
-      NodeList list = node.getChildNodes();
-      log.log(Level.INFO, "Current node has " + list.getLength() + " children");
- 
-      for (int i = 0 ; i < list.getLength() ; i++)
+    }
+  }
+
+  public void generateFromProjectNode(Node node)
+  {
+    String diagram = ((Element)node).getAttribute("diagram");
+    String baseClass = ((Element)node).getAttribute("baseClass");
+
+    if (diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
+    {
+      return;
+    }
+
+    String virtual = ((Element)node).getAttribute("makeVirtual");
+    boolean makeVirtual = AbstractGenerator.makeVirtual;
+
+    if (virtual != null && !virtual.equals(""))
+    {
+      if (virtual.equalsIgnoreCase("true"))
       {
-        Node innerNode = list.item(i);
-        if (innerNode.getNodeType() == Node.ELEMENT_NODE)
-        {
-          recursivelyGenerateFromNode(innerNode);
-        }
+        makeVirtual = true;
+      }
+      else if (virtual.equalsIgnoreCase("false"))
+      {
+        makeVirtual = false;
+      }
+      else
+      {
+        System.err.println("validation error. makeVirtual not set to true or false. was set to: " + virtual);
+        System.exit(1);
       }
     }
 
-    public void generateFromProjectNode(Node node)
+    String derivedString = ((Element)node).getAttribute("derived");
+    boolean derived = AbstractGenerator.derived;
+
+    if (derivedString != null && !derivedString.equals(""))
     {
-      String diagram = ((Element)node).getAttribute("diagram");
-      String baseClass = ((Element)node).getAttribute("baseClass");
-      if(diagram == null || diagram.equals("") || baseClass == null || baseClass.equals(""))
+      if (derivedString.equalsIgnoreCase("true"))
       {
-        return;
+        derived = true;
       }
-      String virtual = ((Element)node).getAttribute("makeVirtual");
-      boolean makeVirtual = AbstractGenerator.makeVirtual;
-      if(virtual != null && !virtual.equals(""))
+      else if (derivedString.equalsIgnoreCase("false"))
       {
-        if(virtual.equalsIgnoreCase("true"))
-        {
-          makeVirtual = true;
-        }
-        else if(virtual.equalsIgnoreCase("false"))
-        {
-          makeVirtual = false;
-        }
-        else
-        {
-          System.err.println("validation error. makeVirtual not set to true or false. was set to: " + virtual);
-          System.exit(1);
-        }
+        derived = false;
       }
-      String derivedString = ((Element)node).getAttribute("derived");
-      boolean derived = AbstractGenerator.derived;
-      if(derivedString != null && !derivedString.equals(""))
+      else
       {
-        if(derivedString.equalsIgnoreCase("true"))
-        {
-          derived = true;
-        }
-        else if(derivedString.equalsIgnoreCase("false"))
-        {
-          derived = false;
-        }
-        else
-        {
-          System.err.println("validation error. derived not set to true or false. was set to: " + derivedString);
-          System.exit(1);
-        }
-      }
-      String outputPath = ((Element)node).getAttribute("outputPath");
-      if(outputPath == null)
-      {
-        outputPath = "";
-      }
-      if(language.equals("c++"))
-      {
-        CPPGenerator generator = new CPPGenerator(globalEventIndex, engineEvents);
-        generator.init(diagram);
-        generator.generateFiles(baseClass, outputPath, makeVirtual, derived);
+        System.err.println("validation error. derived not set to true or false. was set to: " + derivedString);
+        System.exit(1);
       }
     }
+
+    String outputPath = ((Element)node).getAttribute("outputPath");
+
+    if (outputPath == null)
+    {
+      outputPath = "";
+    }
+
+    if (language.equals("c++"))
+    {
+      CPPGenerator generator = new CPPGenerator(globalEventIndex, engineEvents);
+      generator.init(diagram);
+      generator.generateFiles(baseClass, outputPath, makeVirtual, derived);
+    }
+  }
 }

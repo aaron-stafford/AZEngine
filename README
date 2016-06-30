@@ -108,3 +108,15 @@ Command line args
   Specifies the language for which to output the automaton code. Presently, the
   only supported languages are javascript and C++. If no language is specified,
   output defaults to C++.
+
+
+Code Formatting
+===============
+
+Set the environment variable to point to the .astylerc file:
+
+> export ARTISTIC_STYLE_OPTIONS=`pwd`/.astylerc
+
+Run the formatter:
+
+> astyle -R *.java

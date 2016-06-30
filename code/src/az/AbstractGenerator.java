@@ -27,451 +27,456 @@ import org.w3c.dom.NodeList;
 
 public abstract class AbstractGenerator
 {
-    private static final Logger log = Logger.getLogger(AbstractGenerator.class.getName());
-    protected class Transition
-    {
-        String startStateId;
-        String eventId;
-        String endStateId;
+  private static final Logger log = Logger.getLogger(AbstractGenerator.class.getName());
+  protected class Transition
+  {
+    String startStateId;
+    String eventId;
+    String endStateId;
 
-        public Transition(String startStateId, String eventId, String endStateId)
+    public Transition(String startStateId, String eventId, String endStateId)
+    {
+      this.startStateId = startStateId;
+      this.eventId = eventId;
+      this.endStateId = endStateId;
+    }
+  }
+
+  static Hashtable<String, Integer> stateIndex = new Hashtable<String, Integer>();
+  static Hashtable<String, Integer> localEventIndex = new Hashtable<String, Integer>();
+  static Hashtable<String, String> codeBlocks = new Hashtable<String, String>();
+  static ArrayList<Transition> transitions = new ArrayList<Transition>();
+  static String inputFile = null;
+  static String CLASS_NAME = null;
+  static String STATE_METHOD_PREFIX = "AZ_";
+  static ArrayList<String> codeTransitions = new ArrayList<String>();
+  static String initialState = null;
+  static boolean makeVirtual = false;
+  // Derived from Automaton? Or Automaton built in?
+  // Preference is for the class to be derived from an Automaton.
+  // Probably should be default, other case is not-derived.
+  static boolean derived = true;
+  protected Hashtable<String, Integer> globalEventIndex = null;
+  protected Hashtable<String, Integer> engineEventIndex = null;
+
+  public AbstractGenerator(Hashtable<String, Integer> globalEventIndex,
+                           Hashtable<String, Integer> engineEventIndex)
+  {
+    this.globalEventIndex = globalEventIndex;
+    this.engineEventIndex = engineEventIndex;
+  }
+
+  public void init(String diagram)
+  {
+    inputFile = diagram;
+    stateIndex.clear();
+    localEventIndex.clear();
+    codeBlocks.clear();
+    transitions.clear();
+    codeTransitions.clear();
+    populateIndexes();
+    generateDatabase();
+  }
+
+  public void populateIndexes()
+  {
+    try
+    {
+      File fXmlFile = new File(inputFile);
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+                                         .newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(fXmlFile);
+
+      // optional, but recommended
+      // read this -
+      // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+      doc.getDocumentElement().normalize();
+
+      System.out.println("Root element :"
+                         + doc.getDocumentElement().getNodeName());
+
+      Element e = doc.getDocumentElement();
+
+      initialState = e.getAttribute("initial");
+
+      NodeList nList = doc.getElementsByTagName("state");
+
+      System.out.println("----------------------------");
+
+      for (int temp = 0; temp < nList.getLength(); temp++)
+      {
+        Node nNode = nList.item(temp);
+
+        if (nNode.getNodeType() == Node.ELEMENT_NODE)
         {
-            this.startStateId = startStateId;
-            this.eventId = eventId;
-            this.endStateId = endStateId;
-        }
-    }
+          Element eElement = (Element) nNode;
 
-    static Hashtable<String, Integer> stateIndex = new Hashtable<String, Integer>();
-    static Hashtable<String, Integer> localEventIndex = new Hashtable<String, Integer>();
-    static Hashtable<String, String> codeBlocks = new Hashtable<String, String>();
-    static ArrayList<Transition> transitions = new ArrayList<Transition>();
-    static String inputFile = null;
-    static String CLASS_NAME = null;
-    static String STATE_METHOD_PREFIX = "AZ_";
-    static ArrayList<String> codeTransitions = new ArrayList<String>();
-    static String initialState = null;
-    static boolean makeVirtual = false;
-    // Derived from Automaton? Or Automaton built in?
-    // Preference is for the class to be derived from an Automaton.
-    // Probably should be default, other case is not-derived.
-    static boolean derived = true;
-    protected Hashtable<String, Integer> globalEventIndex = null;
-    protected Hashtable<String, Integer> engineEventIndex = null;
+          String stateID = eElement.getAttribute("id");
 
-    public AbstractGenerator(Hashtable<String, Integer> globalEventIndex,
-      Hashtable<String, Integer> engineEventIndex)
-    {
-      this.globalEventIndex = globalEventIndex;
-      this.engineEventIndex = engineEventIndex;
-    }
+          Integer exists = stateIndex.get(stateID);
 
-    public void init(String diagram)
-    {
-        inputFile = diagram;
-        stateIndex.clear();
-        localEventIndex.clear();
-        codeBlocks.clear();
-        transitions.clear();
-        codeTransitions.clear();
-        populateIndexes();
-        generateDatabase();
-    }
+          if (exists == null)
+          {
+            stateIndex.put(stateID, stateIndex.keySet().size() + 1);
+          }
 
-    public void populateIndexes()
-    {
-        try
-        {
-            File fXmlFile = new File(inputFile);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-                    .newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
+          System.out.println("State id: " + stateID);
 
-            // optional, but recommended
-            // read this -
-            // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-            doc.getDocumentElement().normalize();
+          // If there is an onentry attribute, add it's value to the
+          // database.
+          NodeList onEntryNodes = eElement
+                                  .getElementsByTagName("onentry");
 
-            System.out.println("Root element :"
-                    + doc.getDocumentElement().getNodeName());
+          for (int j = 0; j < onEntryNodes.getLength(); j++)
+          {
+            Node onEntryNode = onEntryNodes.item(j);
 
-            Element e = doc.getDocumentElement();
+            NodeList nl = onEntryNode.getChildNodes();
 
-            initialState = e.getAttribute("initial");
-
-            NodeList nList = doc.getElementsByTagName("state");
-
-            System.out.println("----------------------------");
-
-            for (int temp = 0; temp < nList.getLength(); temp++)
+            for (int i = 0; i < nl.getLength(); i++)
             {
-                Node nNode = nList.item(temp);
+              if (nl.item(i).getNodeType() == Element.COMMENT_NODE)
+              {
+                Comment comment = (Comment) nl.item(i);
+                codeBlocks.put(stateID, comment.getData());
+              }
+            }
+          }
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+          NodeList transiationNodes = eElement
+                                      .getElementsByTagName("transition");
+
+          for (int j = 0; j < transiationNodes.getLength(); j++)
+          {
+            Node transitionNode = transiationNodes.item(j);
+
+            if (transitionNode.getNodeType() == Node.ELEMENT_NODE)
+            {
+              Element transitionElement = (Element) transitionNode;
+
+              String eventID = transitionElement
+                               .getAttribute("event");
+
+              if (eventID != null && !eventID.trim().equals(""))
+              {
+                System.out.println("Event : " + eventID);
+
+                exists = localEventIndex.get(eventID);
+
+                if (exists == null)
                 {
-                    Element eElement = (Element) nNode;
+                  Integer value = engineEventIndex.get(eventID);
 
-                    String stateID = eElement.getAttribute("id");
+                  if (value == null)
+                  {
+                    value = globalEventIndex.get(eventID);
 
-                    Integer exists = stateIndex.get(stateID);
-
-                    if (exists == null)
+                    if (value == null)
                     {
-                        stateIndex.put(stateID, stateIndex.keySet().size() + 1);
+                      log.log(Level.SEVERE, "Event not found in global event list");
+                      System.exit(1);
                     }
 
-                    System.out.println("State id: " + stateID);
-
-                    // If there is an onentry attribute, add it's value to the
-                    // database.
-                    NodeList onEntryNodes = eElement
-                            .getElementsByTagName("onentry");
-
-                    for (int j = 0; j < onEntryNodes.getLength(); j++)
-                    {
-                        Node onEntryNode = onEntryNodes.item(j);
-
-                        NodeList nl = onEntryNode.getChildNodes();
-                        for (int i = 0; i < nl.getLength(); i++)
-                        {
-                            if (nl.item(i).getNodeType() == Element.COMMENT_NODE)
-                            {
-                                Comment comment = (Comment) nl.item(i);
-                                codeBlocks.put(stateID, comment.getData());
-                            }
-                        }
-                    }
-
-                    NodeList transiationNodes = eElement
-                            .getElementsByTagName("transition");
-
-                    for (int j = 0; j < transiationNodes.getLength(); j++)
-                    {
-                        Node transitionNode = transiationNodes.item(j);
-
-                        if (transitionNode.getNodeType() == Node.ELEMENT_NODE)
-                        {
-                            Element transitionElement = (Element) transitionNode;
-
-                            String eventID = transitionElement
-                                    .getAttribute("event");
-                            if (eventID != null && !eventID.trim().equals(""))
-                            {
-                                System.out.println("Event : " + eventID);
-
-                                exists = localEventIndex.get(eventID);
-
-                                if (exists == null)
-                                {
-                                    Integer value = engineEventIndex.get(eventID);
-                                    if(value == null)
-                                    {
-                                      value = globalEventIndex.get(eventID);
-                                      if(value == null)
-                                      {
-                                        log.log(Level.SEVERE, "Event not found in global event list");
-                                        System.exit(1);
-                                      }
-                                      localEventIndex.put(eventID, value);
-                                    }
-                                    else
-                                    {
-                                      localEventIndex.put(eventID, value);
-                                    }
-                                }
-
-                                System.out.println("Target : "
-                                        + transitionElement
-                                                .getAttribute("target"));
-                            }
-                        }
-                    }
+                    localEventIndex.put(eventID, value);
+                  }
+                  else
+                  {
+                    localEventIndex.put(eventID, value);
+                  }
                 }
 
-                System.out.println();
+                System.out.println("Target : "
+                                   + transitionElement
+                                   .getAttribute("target"));
+              }
             }
+          }
+        }
 
-            nList = doc.getElementsByTagName("final");
+        System.out.println();
+      }
 
-            System.out.println("----------------------------");
+      nList = doc.getElementsByTagName("final");
 
-            for (int temp = 0; temp < nList.getLength(); temp++)
+      System.out.println("----------------------------");
+
+      for (int temp = 0; temp < nList.getLength(); temp++)
+      {
+        Node nNode = nList.item(temp);
+
+        System.out.println("\nCurrent Element :" + nNode.getNodeName());
+
+        if (nNode.getNodeType() == Node.ELEMENT_NODE)
+        {
+          Element eElement = (Element) nNode;
+
+          String stateID = eElement.getAttribute("id");
+
+          Integer exists = stateIndex.get(stateID);
+
+          if (exists == null)
+          {
+            stateIndex.put(stateID, stateIndex.keySet().size() + 1);
+          }
+        }
+      }
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+
+    // List all states with their new ids
+    System.out.println("States ID mappings:");
+
+    Set<String> stateIDSet = stateIndex.keySet();
+    TreeSet<String> orderedSet = new TreeSet<String>(stateIDSet);
+
+    for (String stateID : orderedSet)
+    {
+      System.out.println(stateID + ": " + stateIndex.get(stateID));
+    }
+
+    // List all events with their new ids
+    System.out.println("event ID mappings:");
+
+    Set<String> eventIDSet = localEventIndex.keySet();
+    TreeSet<String> orderedEventSet = new TreeSet<String>(eventIDSet);
+
+    for (String eventID : orderedEventSet)
+    {
+      System.out.println(eventID + ": " + localEventIndex.get(eventID));
+    }
+  }
+
+  public void generateDatabase()
+  {
+    try
+    {
+      File fXmlFile = new File(inputFile);
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+                                         .newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(fXmlFile);
+
+      // optional, but recommended
+      // read this -
+      // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+      doc.getDocumentElement().normalize();
+
+      System.out.println("Root element :"
+                         + doc.getDocumentElement().getNodeName());
+
+      NodeList nList = doc.getElementsByTagName("state");
+
+      System.out.println("----------------------------");
+
+      for (int temp = 0; temp < nList.getLength(); temp++)
+      {
+
+        Node nNode = nList.item(temp);
+
+        if (nNode.getNodeType() == Node.ELEMENT_NODE)
+        {
+          Element eElement = (Element) nNode;
+
+          String stateID = eElement.getAttribute("id");
+
+          Integer exists = stateIndex.get(stateID);
+
+          if (exists == null)
+          {
+            System.err.println("Index for state with name: "
+                               + stateID + " is unknown.");
+            continue;
+          }
+
+          System.out.println("State id: " + stateID);
+
+          NodeList transiationNodes = eElement
+                                      .getElementsByTagName("transition");
+
+          for (int j = 0; j < transiationNodes.getLength(); j++)
+          {
+            Node transitionNode = transiationNodes.item(j);
+
+            if (transitionNode.getNodeType() == Node.ELEMENT_NODE)
             {
-                Node nNode = nList.item(temp);
+              Element transitionElement = (Element) transitionNode;
 
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
+              String eventID = transitionElement
+                               .getAttribute("event");
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+              if (eventID != null && !eventID.trim().equals(""))
+              {
+                System.out.println("Event : " + eventID);
+
+                exists = localEventIndex.get(eventID);
+
+                if (exists == null)
                 {
-                    Element eElement = (Element) nNode;
-
-                    String stateID = eElement.getAttribute("id");
-
-                    Integer exists = stateIndex.get(stateID);
-
-                    if (exists == null)
-                    {
-                        stateIndex.put(stateID, stateIndex.keySet().size() + 1);
-                    }
+                  System.err
+                  .println("Index for event with name: "
+                           + eventID + " is unknown.");
+                  continue;
                 }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // List all states with their new ids
-        System.out.println("States ID mappings:");
-
-        Set<String> stateIDSet = stateIndex.keySet();
-        TreeSet<String> orderedSet = new TreeSet<String>(stateIDSet);
-
-        for (String stateID : orderedSet)
-        {
-            System.out.println(stateID + ": " + stateIndex.get(stateID));
-        }
-
-        // List all events with their new ids
-        System.out.println("event ID mappings:");
-
-        Set<String> eventIDSet = localEventIndex.keySet();
-        TreeSet<String> orderedEventSet = new TreeSet<String>(eventIDSet);
-
-        for (String eventID : orderedEventSet)
-        {
-            System.out.println(eventID + ": " + localEventIndex.get(eventID));
-        }
-    }
-
-    public void generateDatabase()
-    {
-        try
-        {
-            File fXmlFile = new File(inputFile);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-                    .newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
-
-            // optional, but recommended
-            // read this -
-            // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
-            doc.getDocumentElement().normalize();
-
-            System.out.println("Root element :"
-                    + doc.getDocumentElement().getNodeName());
-
-            NodeList nList = doc.getElementsByTagName("state");
-
-            System.out.println("----------------------------");
-
-            for (int temp = 0; temp < nList.getLength(); temp++)
-            {
-
-                Node nNode = nList.item(temp);
-
-                if (nNode.getNodeType() == Node.ELEMENT_NODE)
+                else
                 {
-                    Element eElement = (Element) nNode;
+                  String target = transitionElement
+                                  .getAttribute("target");
 
-                    String stateID = eElement.getAttribute("id");
+                  transitions.add(new Transition(stateID, eventID, target));
 
-                    Integer exists = stateIndex.get(stateID);
-
-                    if (exists == null)
-                    {
-                        System.err.println("Index for state with name: "
-                                + stateID + " is unknown.");
-                        continue;
-                    }
-
-                    System.out.println("State id: " + stateID);
-
-                    NodeList transiationNodes = eElement
-                            .getElementsByTagName("transition");
-
-                    for (int j = 0; j < transiationNodes.getLength(); j++)
-                    {
-                        Node transitionNode = transiationNodes.item(j);
-
-                        if (transitionNode.getNodeType() == Node.ELEMENT_NODE)
-                        {
-                            Element transitionElement = (Element) transitionNode;
-
-                            String eventID = transitionElement
-                                    .getAttribute("event");
-
-                            if (eventID != null && !eventID.trim().equals(""))
-                            {
-                                System.out.println("Event : " + eventID);
-
-                                exists = localEventIndex.get(eventID);
-
-                                if (exists == null)
-                                {
-                                    System.err
-                                            .println("Index for event with name: "
-                                                    + eventID + " is unknown.");
-                                    continue;
-                                }
-                                else
-                                {
-                                    String target = transitionElement
-                                            .getAttribute("target");
-
-                                    transitions.add(new Transition(stateID, eventID, target));
-
-                                    codeTransitions
-                                            .add("stateMachine.InsertTransition(0, "
-                                                    + stateID
-                                                    + ", "
-                                                    + eventID
-                                                    + ", " + target + ");");
-                                }
-                            }
-                        }
-                    }
+                  codeTransitions
+                  .add("stateMachine.InsertTransition(0, "
+                       + stateID
+                       + ", "
+                       + eventID
+                       + ", " + target + ");");
                 }
-
-                System.out.println();
+              }
             }
-
-            nList = doc.getElementsByTagName("final");
-
-            System.out.println("----------------------------");
-
-            for (int temp = 0; temp < nList.getLength(); temp++)
-            {
-                Node nNode = nList.item(temp);
-
-                System.out.println("\nCurrent Element :" + nNode.getNodeName());
-
-                if (nNode.getNodeType() == Node.ELEMENT_NODE)
-                {
-
-                    Element eElement = (Element) nNode;
-
-                    String stateID = eElement.getAttribute("id");
-
-                    Integer exists = stateIndex.get(stateID);
-
-                    if (exists == null)
-                    {
-                        stateIndex.put(stateID, stateIndex.keySet().size() + 1);
-                    }
-                }
-            }
+          }
         }
-        catch (Exception e)
+
+        System.out.println();
+      }
+
+      nList = doc.getElementsByTagName("final");
+
+      System.out.println("----------------------------");
+
+      for (int temp = 0; temp < nList.getLength(); temp++)
+      {
+        Node nNode = nList.item(temp);
+
+        System.out.println("\nCurrent Element :" + nNode.getNodeName());
+
+        if (nNode.getNodeType() == Node.ELEMENT_NODE)
         {
-            e.printStackTrace();
+
+          Element eElement = (Element) nNode;
+
+          String stateID = eElement.getAttribute("id");
+
+          Integer exists = stateIndex.get(stateID);
+
+          if (exists == null)
+          {
+            stateIndex.put(stateID, stateIndex.keySet().size() + 1);
+          }
         }
-
-        // List all states with their new ids
-        System.out.println("States ID mappings:");
-
-        Set<String> stateIDSet = stateIndex.keySet();
-        TreeSet<String> orderedSet = new TreeSet<String>(stateIDSet);
-
-        for (String stateID : orderedSet)
-        {
-            System.out.println(stateID + ": " + stateIndex.get(stateID));
-        }
-
-        // List all events with their new ids
-        System.out.println("event ID mappings:");
-
-        Set<String> eventIDSet = localEventIndex.keySet();
-        TreeSet<String> orderedEventSet = new TreeSet<String>(eventIDSet);
-
-        for (String eventID : orderedEventSet)
-        {
-            System.out.println(eventID + ": " + localEventIndex.get(eventID));
-        }
+      }
     }
-
-    public abstract StringBuffer genFile(BufferedReader templateReader,
-            boolean makeVirtual);
-    
-    public StringBuffer genFile(String template, boolean makeVirtual)
+    catch (Exception e)
     {
-        BufferedReader reader = new BufferedReader(new StringReader(template));
-        return genFile(reader, makeVirtual);
+      e.printStackTrace();
     }
 
-    public abstract void generateFiles(String className, String outputPath, boolean makeVirtual, boolean derived);
+    // List all states with their new ids
+    System.out.println("States ID mappings:");
 
-    public String generate(String template, String className, boolean makeVirtual)
+    Set<String> stateIDSet = stateIndex.keySet();
+    TreeSet<String> orderedSet = new TreeSet<String>(stateIDSet);
+
+    for (String stateID : orderedSet)
     {
-        AbstractGenerator.CLASS_NAME = className;
-        BufferedReader in = null;
-
-        try
-        {
-            if (in == null)
-            {
-                InputStream is = AbstractGenerator.class.getResourceAsStream("/az/"
-                        + template);
-                in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            }
-
-            StringBuffer output = genFile(in, makeVirtual);
-
-            in.close();
-
-            return output.toString();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        return null;
+      System.out.println(stateID + ": " + stateIndex.get(stateID));
     }
-    
-    public String generateFromExisting(String existingFile, String className, boolean makeVirtual)
+
+    // List all events with their new ids
+    System.out.println("event ID mappings:");
+
+    Set<String> eventIDSet = localEventIndex.keySet();
+    TreeSet<String> orderedEventSet = new TreeSet<String>(eventIDSet);
+
+    for (String eventID : orderedEventSet)
     {
-        AbstractGenerator.CLASS_NAME = className;
-        BufferedReader in = null;
-
-        try
-        {
-            if (in == null)
-            {
-                FileInputStream is = new FileInputStream(new File(existingFile));
-                in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            }
-
-            StringBuffer output = genFile(in, makeVirtual);
-
-            in.close();
-
-            return output.toString();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        return null;
+      System.out.println(eventID + ": " + localEventIndex.get(eventID));
     }
+  }
 
-    public static void writeToFile(String code, String filename)
+  public abstract StringBuffer genFile(BufferedReader templateReader,
+                                       boolean makeVirtual);
+
+  public StringBuffer genFile(String template, boolean makeVirtual)
+  {
+    BufferedReader reader = new BufferedReader(new StringReader(template));
+    return genFile(reader, makeVirtual);
+  }
+
+  public abstract void generateFiles(String className, String outputPath, boolean makeVirtual, boolean derived);
+
+  public String generate(String template, String className, boolean makeVirtual)
+  {
+    AbstractGenerator.CLASS_NAME = className;
+    BufferedReader in = null;
+
+    try
     {
-        try
-        {
-            PrintWriter out = new PrintWriter(filename);
-            out.println(code.toString());
-            out.close();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.exit(1);
-        }
+      if (in == null)
+      {
+        InputStream is = AbstractGenerator.class.getResourceAsStream("/az/"
+                         + template);
+        in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      }
+
+      StringBuffer output = genFile(in, makeVirtual);
+
+      in.close();
+
+      return output.toString();
     }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      System.exit(1);
+    }
+
+    return null;
+  }
+
+  public String generateFromExisting(String existingFile, String className, boolean makeVirtual)
+  {
+    AbstractGenerator.CLASS_NAME = className;
+    BufferedReader in = null;
+
+    try
+    {
+      if (in == null)
+      {
+        FileInputStream is = new FileInputStream(new File(existingFile));
+        in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      }
+
+      StringBuffer output = genFile(in, makeVirtual);
+
+      in.close();
+
+      return output.toString();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      System.exit(1);
+    }
+
+    return null;
+  }
+
+  public static void writeToFile(String code, String filename)
+  {
+    try
+    {
+      PrintWriter out = new PrintWriter(filename);
+      out.println(code.toString());
+      out.close();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+      System.exit(1);
+    }
+  }
 }
