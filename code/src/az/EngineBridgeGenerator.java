@@ -66,9 +66,9 @@ public class EngineBridgeGenerator
         String baseClass = automaton.getAttribute("baseClass");
         String addToRootUpdate = automaton.getAttribute("addToRootUpdate");
 
+        classNames.put(baseClass, baseClass); // Want to generate code for all automata found here.
         if (addToRootUpdate.equalsIgnoreCase("true"))
         {
-          classNames.put(baseClass, baseClass);
           rootUpdateClasses.put(baseClass, baseClass);
         }
 
@@ -76,7 +76,6 @@ public class EngineBridgeGenerator
 
         if (registerTouchDown.equalsIgnoreCase("true"))
         {
-          classNames.put(baseClass, baseClass);
           touchDownClasses.put(baseClass, baseClass);
         }
 
@@ -84,7 +83,6 @@ public class EngineBridgeGenerator
 
         if (registerTouchMove.equalsIgnoreCase("true"))
         {
-          classNames.put(baseClass, baseClass);
           touchMoveClasses.put(baseClass, baseClass);
         }
 
@@ -92,7 +90,6 @@ public class EngineBridgeGenerator
 
         if (registerTouchUp.equalsIgnoreCase("true"))
         {
-          classNames.put(baseClass, baseClass);
           touchUpClasses.put(baseClass, baseClass);
         }
 
@@ -275,9 +272,10 @@ public class EngineBridgeGenerator
 
               String instanceName = instanceNames.get(className);
 
-              if (instanceName != null)
+              if (instanceName != null && !instanceName.equals(""))
               {
                 output.append("    automaton->SetInstanceName(\"" + instanceName + "\");\n");
+                output.append("    m_NamedControllers.push_back(automaton);\n");
               }
 
               output.append("  }\n");

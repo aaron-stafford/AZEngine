@@ -58,3 +58,13 @@ Automaton* EngineBridge::GetTouchMoveController(unsigned int a_Index)
 {
   return m_TouchMoveControllers.at(a_Index);
 }
+
+unsigned int EngineBridge::NamedControllerCount()
+{
+  return m_NamedControllers.size();
+}
+
+Automaton* EngineBridge::GetNamedController(unsigned int a_Index)
+{
+  return m_NamedControllers.at(a_Index);
+}
