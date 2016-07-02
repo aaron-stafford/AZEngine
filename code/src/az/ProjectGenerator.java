@@ -74,8 +74,10 @@ public class ProjectGenerator
   public void populateEngineEvents()
   {
     engineEvents.put("TouchDown", 1);
-    engineEvents.put("TouchUp", 2);
-    engineEvents.put("TouchMove", 3);
+    engineEvents.put("TouchMove", 2);
+    engineEvents.put("TouchUp", 3);
+    engineEvents.put("FirstTouchUp", 4);
+    engineEvents.put("FirstTouchDown", 5);
   }
 
   public void generateAutomata()

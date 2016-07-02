@@ -67,6 +67,7 @@ public class EngineBridgeGenerator
         String addToRootUpdate = automaton.getAttribute("addToRootUpdate");
 
         classNames.put(baseClass, baseClass); // Want to generate code for all automata found here.
+
         if (addToRootUpdate.equalsIgnoreCase("true"))
         {
           rootUpdateClasses.put(baseClass, baseClass);
