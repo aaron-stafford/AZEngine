@@ -29,36 +29,6 @@ Automaton* EngineBridge::GetRootController(unsigned int a_Index)
   return m_RootControllers.at(a_Index);
 }
 
-unsigned int EngineBridge::TouchDownControllerCount()
-{
-  return m_TouchDownControllers.size();
-}
-
-Automaton* EngineBridge::GetTouchDownController(unsigned int a_Index)
-{
-  return m_TouchDownControllers.at(a_Index);
-}
-
-unsigned int EngineBridge::TouchUpControllerCount()
-{
-  return m_TouchUpControllers.size();
-}
-
-Automaton* EngineBridge::GetTouchUpController(unsigned int a_Index)
-{
-  return m_TouchUpControllers.at(a_Index);
-}
-
-unsigned int EngineBridge::TouchMoveControllerCount()
-{
-  return m_TouchMoveControllers.size();
-}
-
-Automaton* EngineBridge::GetTouchMoveController(unsigned int a_Index)
-{
-  return m_TouchMoveControllers.at(a_Index);
-}
-
 unsigned int EngineBridge::NamedControllerCount()
 {
   return m_NamedControllers.size();

@@ -18,19 +18,10 @@ class EngineBridge : public GameplayEngineBridge
     void Init();
     unsigned int RootControllerCount();
     Automaton* GetRootController(unsigned int a_Index);
-    unsigned int TouchDownControllerCount();
-    Automaton* GetTouchDownController(unsigned int a_Index);
-    unsigned int TouchUpControllerCount();
-    Automaton* GetTouchUpController(unsigned int a_Index);
-    unsigned int TouchMoveControllerCount();
-    Automaton* GetTouchMoveController(unsigned int a_Index);
     unsigned int NamedControllerCount();
     Automaton* GetNamedController(unsigned int a_Index);
   private:
     std::vector<Automaton*> m_RootControllers;
-    std::vector<Automaton*> m_TouchUpControllers;;
-    std::vector<Automaton*> m_TouchDownControllers;;
-    std::vector<Automaton*> m_TouchMoveControllers;;
     std::vector<Automaton*> m_NamedControllers;;
 };
 

@@ -71,6 +71,7 @@ public class ProjectGenerator
     generator.generate(projectFile);
   }
 
+  // TODO: this should be read by a config file that can be loaded gameplay side.
   public void populateEngineEvents()
   {
     engineEvents.put("TouchDown", 1);
@@ -78,6 +79,7 @@ public class ProjectGenerator
     engineEvents.put("TouchUp", 3);
     engineEvents.put("FirstTouchUp", 4);
     engineEvents.put("FirstTouchDown", 5);
+    engineEvents.put("ResizeDisplay", 6);
   }
 
   public void generateAutomata()

@@ -1,5 +1,14 @@
 Tool for converting an scxml-based state diagram into code.
 
+Building
+========
+
+> cd code
+> ant clean
+> ant
+
+This creates: code/build/jar/AZClassGenerator.jar
+
 
 Usage examples
 ==============

@@ -258,17 +258,17 @@ public class EngineBridgeGenerator
 
               if (touchDownClasses.get(className) != null)
               {
-                output.append("    m_TouchDownControllers.push_back(automaton);\n");
+                // output.append("    m_TouchDownControllers.push_back(automaton);\n");
               }
 
               if (touchMoveClasses.get(className) != null)
               {
-                output.append("    m_TouchMoveControllers.push_back(automaton);\n");
+                // output.append("    m_TouchMoveControllers.push_back(automaton);\n");
               }
 
               if (touchUpClasses.get(className) != null)
               {
-                output.append("    m_TouchUpControllers.push_back(automaton);\n");
+                // output.append("    m_TouchUpControllers.push_back(automaton);\n");
               }
 
               String instanceName = instanceNames.get(className);
