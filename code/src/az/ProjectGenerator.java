@@ -80,6 +80,7 @@ public class ProjectGenerator
     engineEvents.put("FirstTouchUp", 4);
     engineEvents.put("FirstTouchDown", 5);
     engineEvents.put("ResizeDisplay", 6);
+    engineEvents.put("TouchCancelled", 3);
   }
 
   public void generateAutomata()
